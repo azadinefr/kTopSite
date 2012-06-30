@@ -88,7 +88,7 @@ class kow_Controller
 		return $this->_load;
 	}
 
-	public function model($model = null, $database = 'default')
+	public function model($model = '', $database = 'default')
 	{
 		if(empty($this->_model[$database]))
 			$this->_model[$database] = $this->_load->model($model, $database);

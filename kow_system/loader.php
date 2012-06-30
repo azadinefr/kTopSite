@@ -34,20 +34,23 @@ class kow_Loader
 
 	public function model($model, $database)
 	{
-		$model_path = MODELS_PATH . $this->_controller . '/' . $this->_action . EXT;
+		if($model !== false)
+		{
+			$model_path = MODELS_PATH . $this->_controller . '/' . $this->_action . EXT;
 
-		if(!empty($model))
-			$model_path = MODELS_PATH . $this->_controller . '/' . $model . EXT;
-		else
-			$model = $this->_action;
+			if(!empty($model))
+				$model_path = MODELS_PATH . $this->_controller . '/' . $model . EXT;
+			else
+				$model = $this->_action;
 
-		if(file_exists($model_path))
-			require_once $model_path;
+			if(file_exists($model_path))
+				require_once $model_path;
 
-		if(class_exists($model))
-			return new $model($database);
-		else
-			return new kow_Model($database);
+			if(class_exists($model))
+				return new $model($database);
+		}
+
+		return new kow_Model($database);
 	}
 
 	public function view($view = null)
