@@ -63,6 +63,9 @@ class kow_Framework
 	{
 		$file = explode('_', strtolower($class));
 
+		if(empty($file[0]) OR empty($file[1]))
+			return;
+
 		if($file[0] == 'kow')
 			$file = SYS_PATH . $file[1] . EXT;
 		else if(substr($file[0], -1) == 's')
