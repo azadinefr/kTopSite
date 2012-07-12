@@ -19,7 +19,7 @@ if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$theme_path = &kow_Framework::get_instance()->get('config', 'theme_path');
+$theme_path = kow_Framework::get_instance()->get('config', 'theme_path');
 define('THEME_PATH', $theme_path);
 
 function url($url, $name)

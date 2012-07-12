@@ -130,7 +130,7 @@ class kow_Model
 		foreach($query['fields'] as $k => $v)
 		{
 			if(!is_numeric($v))
-	 			$v = '"' . mysql_escape_string($v) . '"';
+	 			$v = '"' . mysql_real_escape_string($v) . '"';
 
 			$keys[] = $k;
 			$values[] = $v;
@@ -155,7 +155,7 @@ class kow_Model
 		foreach($query['fields'] as $k => $v)
 		{
 			if(!is_numeric($v) && strpos($v, '+') === false && strpos($v, '-') === false)
-	 			$v = '"' . mysql_escape_string($v) . '"';
+	 			$v = '"' . mysql_real_escape_string($v) . '"';
 	 		$fields[] = $k . ' = ' . $v;
 		}
 
@@ -191,7 +191,7 @@ class kow_Model
 		foreach($query['conditions'] as $k => $v)
 	 	{
 		 	if(!is_numeric($v))
-	 			$v = '"' . mysql_escape_string($v) . '"';
+	 			$v = '"' . mysql_real_escape_string($v) . '"';
 			
 			$cond[] = $k . ' = ' . $v;
 		}
@@ -224,7 +224,7 @@ class kow_Model
 			}
 
 			if(!is_numeric($v) && !$compare)
-				$v = '"' . mysql_escape_string($v) . '"';
+				$v = '"' . mysql_real_escape_string($v) . '"';
 
 			if($compare)
 				$cond[] = $k . $v;

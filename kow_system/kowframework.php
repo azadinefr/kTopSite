@@ -116,7 +116,7 @@ class kow_Framework
             $url = explode('/', $_GET['p']);
 
             if(!empty($url[0]))
-            	if(file_exists(CONTROLLERS_PATH . 'Controller_' . $url[0]))
+            	if(file_exists(CONTROLLERS_PATH . $url[0] . EXT))
             		$controller = $url[0];
 
             if(!empty($url[1]))
