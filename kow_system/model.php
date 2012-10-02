@@ -98,8 +98,6 @@ class kow_Model
 		if($p->errorCode() != 0)
 			$this->show_exception($req, $p->errorInfo());
 
-		echo $req;
-
 		return $p->fetchAll(PDO::FETCH_OBJ);
 	}
 
@@ -110,13 +108,10 @@ class kow_Model
 
 	public function findCount($table, $query)
 	{
-		$req = $this->findFirst(array(
+		$req = $this->findFirst($table, array(
 			'fields' => ' COUNT(' . $query['fields'] . ') AS count',
 			'conditions' => isset($query['conditions']) ? $query['conditions'] : ''
 		));
-
-		if($p->errorCode() != 0)
-			$this->show_exception($req, $p->errorInfo());
 
 		return $req->count;
 	}
@@ -130,7 +125,7 @@ class kow_Model
 		foreach($query['fields'] as $k => $v)
 		{
 			if(!is_numeric($v))
-	 			$v = '"' . mysql_real_escape_string($v) . '"';
+	 			$v = $this->_db->quote($v);
 
 			$keys[] = $k;
 			$values[] = $v;
@@ -155,7 +150,7 @@ class kow_Model
 		foreach($query['fields'] as $k => $v)
 		{
 			if(!is_numeric($v) && strpos($v, '+') === false && strpos($v, '-') === false)
-	 			$v = '"' . mysql_real_escape_string($v) . '"';
+	 			$v = $this->_db->quote($v);
 	 		$fields[] = $k . ' = ' . $v;
 		}
 
@@ -191,7 +186,7 @@ class kow_Model
 		foreach($query['conditions'] as $k => $v)
 	 	{
 		 	if(!is_numeric($v))
-	 			$v = '"' . mysql_real_escape_string($v) . '"';
+	 			$v = $this->_db->quote($v);
 			
 			$cond[] = $k . ' = ' . $v;
 		}
@@ -224,7 +219,7 @@ class kow_Model
 			}
 
 			if(!is_numeric($v) && !$compare)
-				$v = '"' . mysql_real_escape_string($v) . '"';
+				$v = $this->_db->quote($v);
 
 			if($compare)
 				$cond[] = $k . $v;
