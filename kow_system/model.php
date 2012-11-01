@@ -19,12 +19,15 @@ if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+define('RETURN_CURRENT', true);
+define('RETURN_FIRST', true);
+
 class kow_Model
 {
 	private $_db = null;
-	private $_req = '';
-	private $_properties = 0;
-	private $_compare = array('<', '>', 'BETWEEN');
+	private $_query = null;
+	private $_index = 0;
+	private $_queryLog = '';
 
 	function __construct($database)
 	{
@@ -51,189 +54,68 @@ class kow_Model
 		return $this->_db;
 	}
 
-	public function find($table, $query = array())
+	public function newQuery($query)
 	{
-		$req = 'SELECT ';
+		$this->_queryLog = $query;
+		$this->_index = 0;
+		$this->_query = $this->_db->prepare($query);
 
-		if(!empty($query['fields']))
-		{
-		 	if(is_array($query['fields']))
-		 		$req .= implode(', ', $query['fields']);
-		 	else
-		 		$req .= $query['fields'];
-		}
+		return $this;
+	}
+
+	public function bindArray($values)
+	{
+		if(is_array($values))
+			foreach($values as $value)
+				$this->bind($value);
+
+		return $this;
+	}
+
+	public function bind($value)
+	{
+        if(is_int($value))
+            $param = PDO::PARAM_INT;
+        elseif(is_bool($value))
+            $param = PDO::PARAM_BOOL;
+        elseif(is_null($value))
+            $param = PDO::PARAM_NULL;
+        elseif(is_string($value))
+            $param = PDO::PARAM_STR;
+        else
+            $param = FALSE;
+
+		if(!$param || !$this->_query->bindValue(++$this->_index, $value, $param))
+			$this->show_exception($this->_queryLog, 'index ' . $this->_index . ' valeur "'. $value .'"');
+
+		return $this;
+	}
+
+	public function exec($current = false)
+	{
+		$this->_query->execute();
+
+		if($this->_query->errorCode() != 0)
+			$this->show_exception($this->_queryLog, $this->_query->errorInfo());
+
+		$result = $this->_query->fetchAll(PDO::FETCH_OBJ);
+
+		if(!$result)
+			return new stdClass;
+		else if($current AND sizeof($result) == 1)
+			return current($result);
 		else
-			$req .= '*';
-
-	 	$req .= ' FROM ' . $table . ' ';
-
-		if(!empty($query['join']))
-			foreach($query['join'] as $k => $v)
-				$req .= 'INNER JOIN ' . $k . ' ON ' . $v . ' ';
-
-	 	if(!empty($query['conditions']))
-	 	{
-	 		$req .= 'WHERE ';
-
-	 		if(!is_array($query['conditions']))
- 				$req .= $query['conditions'];
- 			else
-	 			$cond = $this->parseConditions($query['conditions']);
-
-	 		if(!empty($query['operator']))
-	 			$req .= implode(' ' . $query['operator'] . ' ', $cond);
-	 		else if(!empty($cond))
-	 			$req .= implode(' AND ', $cond);
-		 }
-
-		if(!empty($query['order']))
-			$req .= ' ORDER BY ' . $query['order'];
-
-		if(!empty($query['limit']))
-			$req .= ' LIMIT ' . $query['limit'];
-
-		$p = $this->_db->prepare($req);
-		$p->execute();
-
-		if($p->errorCode() != 0)
-			$this->show_exception($req, $p->errorInfo());
-
-		return $p->fetchAll(PDO::FETCH_OBJ);
+			return $result;
 	}
 
-	public function findFirst($table, $query)
+	public function show_exception($_queryLog, $errorInfo)
 	{
-		return current($this->find($table, $query));
-	}
-
-	public function findCount($table, $query)
-	{
-		$req = $this->findFirst($table, array(
-			'fields' => ' COUNT(' . $query['fields'] . ') AS count',
-			'conditions' => isset($query['conditions']) ? $query['conditions'] : ''
-		));
-
-		return $req->count;
-	}
-
-	public function add($table, $query)
-	{
-		$req = 'INSERT INTO ' . $table;
-
-		$keys = array();
-		$values = array();
-		foreach($query['fields'] as $k => $v)
-		{
-			if(!is_numeric($v))
-	 			$v = $this->_db->quote($v);
-
-			$keys[] = $k;
-			$values[] = $v;
-		}
-
-		$req .= ' (' . implode(', ', $keys) . ') ';
-		$req .= ' VALUES ';
-		$req .= ' (' . implode(', ', $values) . ')' ;
-
-		$p = $this->_db->prepare($req);
-		$p->execute();
-
-		if($p->errorCode() != 0)
-			$this->show_exception($req, $p->errorInfo());
-	}
-
-	public function update($table, $query)
-	{
-		$req = 'UPDATE ' . $table . ' SET ';
-
-		$fields = array();
-		foreach($query['fields'] as $k => $v)
-		{
-			if(!is_numeric($v) && strpos($v, '+') === false && strpos($v, '-') === false)
-	 			$v = $this->_db->quote($v);
-	 		$fields[] = $k . ' = ' . $v;
-		}
-
-		$req .= implode(' , ', $fields);
-		
-		if(!empty($query['conditions']))
-	 	{
-	 		$req .= ' WHERE ';
-
-	 		if(!is_array($query['conditions']))
- 				$req .= $query['conditions'];
- 			else
-	 			$cond = $this->parseConditions($query['conditions']);
-
-	 		if(!empty($query['operator']))
-	 			$req .= implode(' ' . $query['operator'] . ' ', $cond);
-	 		else if(!empty($cond))
-	 			$req .= implode(' AND ', $cond);
-		}
-
-		$p = $this->_db->prepare($req);
-		$p->execute();
-
-		if($p->errorCode() != 0)
-			$this->show_exception($req, $p->errorInfo());
-	}
-
-	public function delete($table, $query)
-	{
-		$req = 'DELETE FROM ' . $table . ' WHERE ';
-
-		$cond = array();
-		foreach($query['conditions'] as $k => $v)
-	 	{
-		 	if(!is_numeric($v))
-	 			$v = $this->_db->quote($v);
-			
-			$cond[] = $k . ' = ' . $v;
-		}
-
-		if(!empty($query['operator']))
-	 		$req .= implode(' ' . $query['operator'] . ' ', $cond);
-	 	else
-	 		$req .= implode(' AND ', $cond);
-
-		$p = $this->_db->prepare($req);
-		$p->execute();
-
-		if($p->errorCode() != 0)
-			$this->show_exception($req, $p->errorInfo());
-	}
-
-	public function parseConditions($conditions)
-	{
-		$cond = array();
-		foreach($conditions as $k => $v)
-		{
-			$compare = false;
-			foreach($this->_compare as $c)
-			{
-				if(strpos($v, $c) !== false)
-				{
-					$compare = true;
-					break;
-				}
-			}
-
-			if(!is_numeric($v) && !$compare)
-				$v = $this->_db->quote($v);
-
-			if($compare)
-				$cond[] = $k . $v;
-			else
-				$cond[] = $k . ' = ' . $v;
-		}
-
- 		return $cond;
-	}
-
-	public function show_exception($req, $errorInfo)
-	{
-		throw new Exception('Erreur lors de l\'exécution de la requête SQL : ' . $req . '<br /><br />
-			<strong>Code :</strong> ' . $errorInfo[1] . '<br />
-			<strong>Message :</strong> ' . $errorInfo[2]);
+		if(is_array($errorInfo))
+			throw new Exception('Erreur lors de l\'exécution de la requête SQL : ' . $req . '<br /><br />
+				<strong>Code :</strong> ' . $errorInfo[1] . '<br />
+				<strong>Message :</strong> ' . $errorInfo[2]);
+		else
+			throw new Exception('Erreur lors de l\'exécution de la requête SQL : ' . $req . '<br /><br />
+				<strong>Impossible de lier le paramètre</strong> ' . $errorInfo);
 	}
 }

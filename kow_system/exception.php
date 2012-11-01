@@ -26,6 +26,12 @@ class kow_Exception
 		if(!(error_reporting() & $errno))
 			return;
 
+		if(DEBUG_MODE)
+		{
+			echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>Une erreur est survenue. Veuillez contacter l\'administrateur du site ou activer le mode debug.</body></html>';
+			exit;
+		}
+
 		switch($errno)
 		{
 			case E_USER_ERROR:
@@ -50,7 +56,7 @@ class kow_Exception
 			if(!empty($v['line']) AND !empty($v['file']))
 				$trace .= '<strong>Ligne : </strong>' . $v['line'] . ' <strong>du fichier : </strong> ' . $v['file'] . '<br />';
 
-		echo '<html lang="fr"><head><meta charset="utf-8" /></head>
+		echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>
 				<div style="background-color: #F6DDDD; border: 1px solid #FD1717; color: #8C2E0B; padding: 10px;">
 					<h4>Une erreur PHP est survenue</h4>
 					<strong>' . $type . '</strong>' . $errstr . '<br /><br />
@@ -58,19 +64,25 @@ class kow_Exception
 					<strong>Appel : </strong><br /><pre>'
 				. $trace .
 			 	'</pre></div>
-			 </html>';
+			 </body></html>';
 
 		exit;
 	}
 
 	public static function exception_handler($exception)
 	{
+		if(DEBUG_MODE)
+		{
+			echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>Une exception est survenue. Veuillez contacter l\'administrateur du site ou activer le mode debug.</body></html>';
+			exit;
+		}
+
 		$trace = '';
 		foreach($exception->getTrace() as $k => $v)
 			if(!empty($v['line']) AND !empty($v['file']))
 				$trace .= '<strong>Ligne : </strong>' . $v['line'] . ' <strong>du fichier : </strong> ' . $v['file'] . '<br />';
 
-		echo '<html lang="fr"><head><meta charset="utf-8" /></head>
+		echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>
 				<div style="background-color: #F6DDDD; border: 1px solid #FD1717; color: #8C2E0B; padding: 10px;">
 					<h4>Une exception est survenue</h4>
 					<strong>Message : </strong>' . $exception->getMessage() . '<br /><br />
@@ -78,7 +90,7 @@ class kow_Exception
 					<strong>Appel : </strong><br /><pre>'
 					. $trace .
 			 	'</pre></div>
-			 </html>';
+			 </body></html>';
 
 		exit;
 	}

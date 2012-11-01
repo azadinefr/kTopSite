@@ -26,7 +26,7 @@ class kow_Controller
 	private $_vars = array();
 	private $_model = array();
 	private $_request = array();
-	private $_view = '';
+	private $_view = null;
 	private $_rendered = false;
 
 	public function __construct()
@@ -88,12 +88,19 @@ class kow_Controller
 		return $this->_load;
 	}
 
-	public function model($model = '', $database = 'default')
+	public function model($database, $model = null)
 	{
-		if(empty($this->_model[$database]))
-			$this->_model[$database] = $this->_load->model($model, $database);
+		if($model === false)
+			$index = 0;
+		else if($model === null)
+			$index = $this->_view;
+		else
+			$index = $model;
 
-		return $this->_model[$database];
+		if(empty($this->_model[$database][$index]))
+			$this->_model[$database][$index] = $this->_load->model($model, $database);
+
+		return $this->_model[$database][$index];
 	}
 
 	public function render()
@@ -101,9 +108,7 @@ class kow_Controller
         if($this->_rendered)
             return;
 
-        if(empty($this->_view))
-        	$this->_load->view();
-        
+        $this->_load->view($this->_view);
         extract($this->_vars);
 
         ob_start();

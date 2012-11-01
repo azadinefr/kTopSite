@@ -44,10 +44,13 @@ class kow_Loader
 				$model = $this->_action;
 
 			if(file_exists($model_path))
+			{
 				require_once $model_path;
-
-			if(class_exists($model))
-				return new $model($database);
+				if(class_exists($model))
+					return new $model($database);
+			}
+			else
+				throw new Exception('Le modèle "' . $model_path . '" pour l\'action "' . $this->_action . '" du contrôleur "' . $this->_controller . ' n\'existe pas."');
 		}
 
 		return new kow_Model($database);
