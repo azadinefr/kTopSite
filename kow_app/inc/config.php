@@ -46,10 +46,15 @@ $config['theme_path'] = 'default';
 $config['timezone'] = 'Europe/Zurich';
 
 /**
- * Activer (true) ou désactiver (false) le système de hooks
- * Par défaut : true (activé)
+ * Activer (true) ou désactiver (false) le système de plugin
+ * Par défaut : false (désactivé)
  */
-$config['enable_hooks'] = true;
+$config['enable_plugins'] = false;
+
+/**
+ * Liste des plugins à charger
+ */
+$config['plugins'] = array();
 
 /**
  * Chargement automatique des helpers spéficié ci-dessous

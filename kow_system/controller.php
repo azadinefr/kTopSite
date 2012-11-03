@@ -115,7 +115,11 @@ class kow_Controller
 		require_once $this->_view;
 		$layoutContent = ob_get_clean();
 
-        require_once $this->_load->theme($layoutContent);
+        $content = $this->_load->theme($layoutContent);
+        
+        kow_Framework::run_hook('post_render', $content);
+
+        echo $content;
         $this->_rendered = true;
 	}
 }

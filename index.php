@@ -37,6 +37,7 @@ define('VIEWS_PATH', 		APP_PATH . 'views/');
 define('CONTROLLERS_PATH', 	APP_PATH . 'controllers/');
 
 define('HELPERS_PATH', 		APP_PATH . 'helpers/');
+define('PLUGINS_PATH',		APP_PATH . 'plugins/');
 define('THEMES_PATH', 		APP_PATH . 'themes/');
 
 define('EXT', 				'.php');

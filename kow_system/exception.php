@@ -26,7 +26,7 @@ class kow_Exception
 		if(!(error_reporting() & $errno))
 			return;
 
-		if(DEBUG_MODE)
+		if(!DEBUG_MODE)
 		{
 			echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>Une erreur est survenue. Veuillez contacter l\'administrateur du site ou activer le mode debug.</body></html>';
 			exit;
@@ -71,7 +71,7 @@ class kow_Exception
 
 	public static function exception_handler($exception)
 	{
-		if(DEBUG_MODE)
+		if(!DEBUG_MODE)
 		{
 			echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>Une exception est survenue. Veuillez contacter l\'administrateur du site ou activer le mode debug.</body></html>';
 			exit;

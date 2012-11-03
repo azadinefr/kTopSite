@@ -31,6 +31,7 @@ class kow_Framework
 {
 	private static $_instance = null;
 	private $_vars = array();
+	private $_hook_list = array('pre_render', 'post_render');
 
 	public function __construct()
 	{
@@ -48,6 +49,7 @@ class kow_Framework
 			date_default_timezone_set($config['timezone']);
 
 		$this->set('config', $config);
+		$this->load_plugins();
 		
 		$this->route();
 		$c = $this->dispatch();
@@ -59,6 +61,36 @@ class kow_Framework
 		return self::$_instance;
 	}
 
+	public function set($category, $key, $value = null, $force_array = false)
+	{
+		if(is_null($value))
+		{
+			$this->_vars[$category] = array();
+			$this->_vars[$category] = array_merge($this->_vars[$category], $key);
+		}
+		else
+		{
+			if((isset($this->_vars[$category]) AND is_array($this->_vars[$category])) OR $force_array)
+				$this->_vars[$category][$key][] = $value;
+			else
+				$this->_vars[$category][$key] = $value;
+		}
+	}
+
+	public function get($category, $key = null, $show_exception = true)
+	{
+		if(is_null($key))
+			return $this->_vars[$category];
+		else if(isset($this->_vars[$category][$key]))
+			return $this->_vars[$category][$key];
+
+		if($show_exception)
+			throw new Exception('Le paramètre "' . $key . '" de la catégorie "' . $category . '" n\'existe pas.');
+		else
+			return null;
+	}
+
+	// Todo check if class is already loaded
 	public static function auto_load($class)
 	{
 		$file = explode('_', strtolower($class));
@@ -79,30 +111,64 @@ class kow_Framework
 			throw new Exception('Le fichier "' . $file . '" n\'existe pas. Tentative d\'inclusion pour la classe "' . $class . '"');
 	}
 
-	public function set($category, $key, $value = null)
+	public function load_plugins()
 	{
-		if(is_null($value))
+		if($this->get('config', 'enable_plugins'))
 		{
-			$this->_vars[$category] = array();
-			$this->_vars[$category] = array_merge($this->_vars[$category], $key);
-		}
-		else
-		{
-			if(isset($this->_vars[$category]) && is_array($this->_vars[$category]))
-				$this->_vars[$category][$key][] = $value;
-			else
-				$this->_vars[$category][$key] = $value;
+			foreach($this->get('config', 'plugins') as $file)
+			{
+				if(file_exists(PLUGINS_PATH . $file . EXT))
+				{
+					require_once PLUGINS_PATH . $file . EXT;
+					$plugin_class = 'Plugin_' . ucfirst(end(explode('/', $file)));
+
+					if(class_exists($plugin_class, false))
+					{
+						if(method_exists($plugin_class, 'load'))
+							call_user_func(array($plugin_class, 'load'), $this->get('config'));
+
+						foreach(get_class_methods($plugin_class) as $function)
+							if(in_array($function, $this->_hook_list))
+								$this->set('hooks', $function, array($plugin_class, $function), true);
+					}
+				}
+				else
+					throw new Exception('Le plugin "' . PLUGINS_PATH . $file . '" n\'existe pas.');
+			}
 		}
 	}
 
-	public function get($category, $key = null)
+	public static function register_hook($hook_name, $function)
 	{
-		if(is_null($key))
-			return $this->_vars[$category];
-		else if(isset($this->_vars[$category][$key]))
-			return $this->_vars[$category][$key];
+		kow_Framework::get_instance()->set('hooks', $hook_name, $function, true);
+	}
 
-		throw new Exception('Le paramètre "' . $key . '" de la catégorie "' . $category . '" n\'existe pas.');
+	public static function run_hook($hook_name, &$arguments = array())
+	{
+		$hook_list = kow_Framework::get_instance()->get('hooks', $hook_name, false);
+
+		if(!empty($hook_list))
+		{
+			$result = array();
+			ksort($hook_list);
+
+			foreach($hook_list as $function)
+			{
+				if(is_array($function))
+				{
+					if(method_exists($function[0], $function[1]))
+						$result[$function[1]] = $function[0]::$function[1]($arguments);
+				}
+				else
+				{
+					if(function_exists($function))
+						$result[$function] = $function($arguments);
+				}
+			}
+
+			return $result;
+		}
+		return array();
 	}
 
 	public function route()
@@ -136,10 +202,9 @@ class kow_Framework
 	public function dispatch()
 	{
 		$controller_class = 'Controller_' . ucfirst($this->get('router', 'controller'));
-		$controller_path = CONTROLLERS_PATH . $this->get('router', 'controller') . EXT;
 		$action = $this->get('router', 'action');
 		$params = $this->get('router', 'params');
-		
+
 		if(!in_array($action, array_diff(
 			get_class_methods($controller_class),
 			get_class_methods(get_parent_class($controller_class)))
@@ -149,8 +214,9 @@ class kow_Framework
         $c = new $controller_class;
 
         foreach($this->get('config', 'autoload_helpers') as $v)
-        		$c->load()->helper($v);
+        	$c->load()->helper($v);
 
+        kow_Framework::run_hook('pre_render');
         call_user_func_array(array($c, $action), array($params));
 
         return $c;
