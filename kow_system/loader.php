@@ -96,8 +96,6 @@ class kow_Loader
 		if(file_exists(THEMES_PATH . $this->_theme_path . '/templates/' . $this->_controller . '_' . $this->_action . EXT))
 			$theme = THEMES_PATH . $this->_theme_path . '/templates/' . $this->_controller . '_' . $this->_action . EXT;
 
-		ob_start();
-		require_once $theme;
-		return ob_get_clean();
+		return $theme;
 	}
 }
