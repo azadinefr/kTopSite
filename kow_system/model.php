@@ -100,9 +100,7 @@ class kow_Model
 
 		$result = $this->_query->fetchAll(PDO::FETCH_OBJ);
 
-		if(!$result)
-			return new stdClass;
-		else if($current AND sizeof($result) == 1)
+		if($current AND sizeof($result) == 1)
 			return current($result);
 		else
 			return $result;
