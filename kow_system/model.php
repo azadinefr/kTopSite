@@ -111,11 +111,11 @@ class kow_Model
 	public function show_exception($_queryLog, $errorInfo)
 	{
 		if(is_array($errorInfo))
-			throw new Exception('Erreur lors de l\'exécution de la requête SQL : ' . $req . '<br /><br />
+			throw new Exception('Erreur lors de l\'exécution de la requête SQL : ' . $_queryLog . '<br /><br />
 				<strong>Code :</strong> ' . $errorInfo[1] . '<br />
 				<strong>Message :</strong> ' . $errorInfo[2]);
 		else
-			throw new Exception('Erreur lors de l\'exécution de la requête SQL : ' . $req . '<br /><br />
+			throw new Exception('Erreur lors de l\'exécution de la requête SQL : ' . $_queryLog . '<br /><br />
 				<strong>Impossible de lier le paramètre</strong> ' . $errorInfo);
 	}
 }
