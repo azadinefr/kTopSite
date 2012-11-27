@@ -24,19 +24,25 @@ class kow_Loader
 	private $_controller = '';
 	private $_action = '';
 	private $_theme_path = '';
+	private $_plugin_handled = false;
 
 	public function __construct()
 	{
-		$this->_controller = kow_Framework::get_instance()->get('router', 'controller');
-		$this->_action = kow_Framework::get_instance()->get('router', 'action');
-		$this->_theme_path = kow_Framework::get_instance()->get('config', 'theme_path');
+		$kwf = kow_Framework::get_instance();
+		$this->_controller = $kwf->get('router', 'controller');
+		$this->_action = $kwf->get('router', 'action');
+		$this->_theme_path = $kwf->get('config', 'theme_path');
+		$this->_plugin_handled = $kwf->get('config', 'plugin_handled', false);
 	}
 
 	public function model($model, $database)
 	{
 		if($model !== false)
 		{
-			$model_path = MODELS_PATH . $this->_controller . '/' . $this->_action . EXT;
+			if($this->_plugin_handled)
+				$model_path = PLUGINS_PATH . $this->_plugin_handled . '/models/' . $this->_action . EXT;
+			else
+				$model_path = MODELS_PATH . $this->_controller . '/' . $this->_action . EXT;
 
 			if(!empty($model))
 				$model_path = MODELS_PATH . $this->_controller . '/' . $model . EXT;
@@ -58,11 +64,13 @@ class kow_Loader
 
 	public function view($view = null)
 	{
+		$path_view = ($this->_plugin_handled) ? PLUGINS_PATH . $this->_plugin_handled . '/views' : VIEWS_PATH . $this->_controller;
 		if(is_null($view))
-			$view = VIEWS_PATH . $this->_controller . '/' . $this->_action . EXT;
+			$view = $path_view . '/' . $this->_action . EXT;
 		else
-	    	$view = VIEWS_PATH . $this->_controller . '/' . $view . EXT;
+	    	$view = $path_view .  '/' . $view . EXT;
 
+	    // à modifier si handler par un plugin
         if(!file_exists($view))
         {
         	if(DEBUG_MODE)
@@ -74,15 +82,20 @@ class kow_Loader
         kow_Controller::get_instance()->set_view($view);
 	}
 
-	public function helper($helper)
+	public function helper($helper, $force_default_path = false)
 	{
-		$helper_path = HELPERS_PATH . $helper . EXT;
+		if(!$force_default_path AND $this->_plugin_handled)
+			$helper_path =  PLUGINS_PATH . $this->_plugin_handled . '/helpers/' . $helper . EXT;
+		else
+			$helper_path  = HELPERS_PATH . $helper . EXT;
+
 		if(file_exists($helper_path))
 			require_once $helper_path;
 		else
 			throw new Exception('Le helper "' . $helper_path . '" n\'existe pas.');
 	}
 
+	// Est-ce qu'on supporte les thèmes handler par les plugins ??
 	public function theme($layoutContent)
 	{
 		$theme = THEMES_PATH . $this->_theme_path . '/' . 'default.php';

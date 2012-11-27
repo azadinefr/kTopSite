@@ -19,7 +19,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define('KOWFRAMEWORK', '1.0.5');
+define('KOWFRAMEWORK', '1.0.6');
 
 require_once SYS_PATH . 'exception' . EXT;
 
@@ -31,7 +31,7 @@ class kow_Framework
 {
 	private static $_instance = null;
 	private $_vars = array();
-	private $_hook_list = array('pre_render', 'post_render');
+	private $_hook_list = array('post_route', 'pre_render', 'post_render');
 
 	public function __construct()
 	{
@@ -70,7 +70,7 @@ class kow_Framework
 		}
 		else
 		{
-			if((isset($this->_vars[$category]) AND is_array($this->_vars[$category])) OR $force_array)
+			if((isset($this->_vars[$category][$key]) AND is_array($this->_vars[$category][$key])) OR $force_array)
 				$this->_vars[$category][$key][] = $value;
 			else
 				$this->_vars[$category][$key] = $value;
@@ -90,7 +90,14 @@ class kow_Framework
 			return null;
 	}
 
-	// Todo check if class is already loaded
+	static function handle_by_plugin($name = null)
+	{
+		if($name)
+			kow_Framework::get_instance()->set('config', 'plugin_handled', $name);
+		else
+			return kow_Framework::get_instance()->get('config', 'plugin_handled', false);
+	}
+
 	public static function auto_load($class)
 	{
 		$file = explode('_', strtolower($class));
@@ -100,10 +107,14 @@ class kow_Framework
 
 		if($file[0] == 'kow')
 			$file = SYS_PATH . $file[1] . EXT;
-		else if(substr($file[0], -1) == 's')
-			$file = APP_PATH . $file[0] . '/' . $file[1] . EXT;
 		else
-			$file = APP_PATH . $file[0] . 's/' . $file[1] . EXT;
+		{
+			$path = (self::handle_by_plugin()) ? PLUGINS_PATH . self::handle_by_plugin() . '/' : APP_PATH;
+			if(substr($file[0], -1) == 's')
+				$file = $path . $file[0] . '/' . $file[1] . EXT;
+			else
+				$file = $path . $file[0] . 's/' . $file[1] . EXT;
+		}
 
 		if(file_exists($file))
 			require_once $file;
@@ -133,7 +144,7 @@ class kow_Framework
 					}
 				}
 				else
-					throw new Exception('Le plugin "' . PLUGINS_PATH . $file . '" n\'existe pas.');
+					throw new Exception('Le plugin "' . PLUGINS_PATH . $file . EXT . '" n\'existe pas.');
 			}
 		}
 	}
@@ -157,12 +168,18 @@ class kow_Framework
 				if(is_array($function))
 				{
 					if(method_exists($function[0], $function[1]))
-						$result[$function[1]] = $function[0]::$function[1]($arguments);
+						if(isset($result[$function[1]]))
+							$result[$function[1]] += $function[0]::$function[1]($arguments);
+						else
+							$result[$function[1]] = $function[0]::$function[1]($arguments);
 				}
 				else
 				{
 					if(function_exists($function))
-						$result[$function] = $function($arguments);
+						if(isset($result[$function]))
+							$result[$function] += $function($arguments);
+						else
+							$result[$function] = $function($arguments);
 				}
 			}
 
@@ -182,8 +199,7 @@ class kow_Framework
             $url = explode('/', $_GET['p']);
 
             if(!empty($url[0]))
-            	if(file_exists(CONTROLLERS_PATH . $url[0] . EXT))
-            		$controller = $url[0];
+            	$controller = $url[0];
 
             if(!empty($url[1]))
             	$action = $url[1];
@@ -197,27 +213,31 @@ class kow_Framework
 			'params' 		=> $params,
 			'routes'		=> array()
 		));
+
+		self::run_hook('post_route', $this->get('router'));
 	}
 
 	public function dispatch()
 	{
-		$controller_class = 'Controller_' . ucfirst($this->get('router', 'controller'));
-		$action = $this->get('router', 'action');
-		$params = $this->get('router', 'params');
+		$controller_path = ($this->get('config', 'plugin_handled', false)) ? PLUGINS_PATH . $this->get('config', 'plugin_handled', false) . '/' : CONTROLLERS_PATH;
+		if(!file_exists($controller_path . $this->get('router', 'controller') . EXT))
+			$this->set('router', 'controller', $this->get('config', 'default_controller'));
 
-		if(!in_array($action, array_diff(
+		$controller_class = 'Controller_' . ucfirst($this->get('router', 'controller'));
+
+		if(!in_array($this->get('router', 'action'), array_diff(
 			get_class_methods($controller_class),
 			get_class_methods(get_parent_class($controller_class)))
 		))
-			$action = $this->get('config', 'default_error404_view');
+			$this->set('router', 'action', $this->get('config', 'default_error404_view'));
         
         $c = new $controller_class;
 
         foreach($this->get('config', 'autoload_helpers') as $v)
-        	$c->load()->helper($v);
+        	$c->load()->helper($v, true);
 
         kow_Framework::run_hook('pre_render');
-        call_user_func_array(array($c, $action), array($params));
+        call_user_func_array(array($c, $this->get('router', 'action')), array($this->get('router', 'params')));
 
         return $c;
 	}
