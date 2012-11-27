@@ -70,7 +70,6 @@ class kow_Loader
 		else
 	    	$view = $path_view .  '/' . $view . EXT;
 
-	    // à modifier si handler par un plugin
         if(!file_exists($view))
         {
         	if(DEBUG_MODE)
@@ -84,7 +83,7 @@ class kow_Loader
 
 	public function helper($helper, $force_default_path = false)
 	{
-		if(!$force_default_path AND $this->_plugin_handled)
+		if(!$force_default_path and $this->_plugin_handled)
 			$helper_path =  PLUGINS_PATH . $this->_plugin_handled . '/helpers/' . $helper . EXT;
 		else
 			$helper_path  = HELPERS_PATH . $helper . EXT;

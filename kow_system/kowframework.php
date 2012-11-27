@@ -19,13 +19,18 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define('KOWFRAMEWORK', '1.0.6');
+define('KOWFRAMEWORK', '1.0.7');
 
 require_once SYS_PATH . 'exception' . EXT;
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
 spl_autoload_register(array('kow_Framework', 'auto_load'));
+
+function kfw_version()
+{
+	echo KOWFRAMEWORK;
+}
 
 class kow_Framework
 {
@@ -42,7 +47,7 @@ class kow_Framework
 
 		require_once CONFIG_PATH;
 
-		if(empty($config) OR !is_array($config))
+		if(empty($config) or !is_array($config))
 			throw new Exception('Le fichier de configuration "' . CONFIG_PATH . '" est mal formaté.');
 
 		if(@date_default_timezone_set(date_default_timezone_get()) === false)
@@ -70,7 +75,7 @@ class kow_Framework
 		}
 		else
 		{
-			if((isset($this->_vars[$category][$key]) AND is_array($this->_vars[$category][$key])) OR $force_array)
+			if((isset($this->_vars[$category][$key]) and is_array($this->_vars[$category][$key])) or $force_array)
 				$this->_vars[$category][$key][] = $value;
 			else
 				$this->_vars[$category][$key] = $value;
@@ -102,7 +107,7 @@ class kow_Framework
 	{
 		$file = explode('_', strtolower($class));
 
-		if(empty($file[0]) OR empty($file[1]))
+		if(empty($file[0]) or empty($file[1]))
 			return;
 
 		if($file[0] == 'kow')

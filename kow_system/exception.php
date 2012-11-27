@@ -53,7 +53,7 @@ class kow_Exception
 
 		$trace = '';
 		foreach(debug_backtrace() as $k => $v)
-			if(!empty($v['line']) AND !empty($v['file']))
+			if(!empty($v['line']) and !empty($v['file']))
 				$trace .= '<strong>Ligne : </strong>' . $v['line'] . ' <strong>du fichier : </strong> ' . $v['file'] . '<br />';
 
 		echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>
@@ -79,7 +79,7 @@ class kow_Exception
 
 		$trace = '';
 		foreach($exception->getTrace() as $k => $v)
-			if(!empty($v['line']) AND !empty($v['file']))
+			if(!empty($v['line']) and !empty($v['file']))
 				$trace .= '<strong>Ligne : </strong>' . $v['line'] . ' <strong>du fichier : </strong> ' . $v['file'] . '<br />';
 
 		echo '<html lang="fr"><head><meta charset="utf-8" /></head><body>

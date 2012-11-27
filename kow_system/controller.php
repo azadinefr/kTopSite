@@ -56,7 +56,7 @@ class kow_Controller
 	public function request($method)
 	{
 		$method = strtoupper($method);
-		if($method != 'POST' AND $method != 'GET')
+		if($method != 'POST' and $method != 'GET')
 			throw new Exception('Méthode "' . $method . '" iconnue. Choisir entre "GET" ou "POST".');
 
 		if(empty($this->_request[$method]))

@@ -100,7 +100,7 @@ class kow_Model
 
 		$result = $this->_query->fetchAll(PDO::FETCH_OBJ);
 
-		if($current AND sizeof($result) == 1)
+		if($current and sizeof($result) == 1)
 			return current($result);
 		else
 			return $result;
