@@ -20,6 +20,14 @@ if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
  */
 
 /**
+ * Activer (true) ou désactiver (false) la ré-écriture d'URL
+ * Si activé : http://localhost/kowframework/page/index
+ * Si désactivé : http://localhost/kowframework/index.php?p=page/index
+ * Par défaut : false (désactivé)
+ */
+$config['enable_url_rewriting'] = false;
+
+/**
  * Contrôleur et action utilisé par défaut
  * Par défaut : page/index
  */

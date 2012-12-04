@@ -10,7 +10,7 @@
 		<?php echo $layoutContent; ?>
 
 	    <footer>
-	    	kowFramework 2011-2012 Kevin Ryser | <?php img('powered.png', 'Propulsé par kowFramework'); ?>
+	    	kowFramework 2011-2012 Kevin Ryser | <img src="<?php img_path('powered.png'); ?>" alt="Propulsé par kowFramework" />
 	    </footer>
     </body>
 </html>

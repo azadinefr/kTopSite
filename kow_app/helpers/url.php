@@ -19,12 +19,21 @@ if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$theme_path = kow_Framework::get_instance()->get('config', 'theme_path');
-define('THEME_PATH', $theme_path);
+$kfw_config = kow_Framework::get_instance()->get('config');
+define('THEME_PATH', $kfw_config['theme_path']);
+define('URL_REWRITING_ENABLED', $kfw_config['enable_url_rewriting']);
 
-function url($url, $name)
+function url_path($url)
 {
-	echo '<a href="index.php?p=' . $url . '" alt="' . $name . '">' . $name . '</a>';
+	if(URL_REWRITING_ENABLED)
+		echo BASE_URL . $url;
+	else
+		echo 'index.php?p=' . $url;
+}
+
+function img_path($image)
+{
+	echo BASE_URL . THEMES_PATH . THEME_PATH . '/images/' .  $image;
 }
 
 function redirect($url)
@@ -34,15 +43,10 @@ function redirect($url)
 
 function css($name)
 {
-	echo '<link href="' . THEMES_PATH . THEME_PATH . '/css/' . $name . '" rel="stylesheet">' . PHP_EOL;
-}
-
-function img($name, $alt)
-{
-	echo '<img src="' . THEMES_PATH . THEME_PATH . '/images/' .  $name . '" alt="' . $alt . '" />';
+	echo '<link href="' . BASE_URL . THEMES_PATH . THEME_PATH . '/css/' . $name . '" rel="stylesheet">' . PHP_EOL;
 }
 
 function js($name)
 {
-	echo '<script src="' . THEMES_PATH . THEME_PATH . '/jscripts/' . $name . '"></script>' . PHP_EOL;
+	echo '<script src="' . BASE_URL . THEMES_PATH . THEME_PATH . '/jscripts/' . $name . '"></script>' . PHP_EOL;
 }

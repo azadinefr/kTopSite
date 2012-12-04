@@ -27,6 +27,11 @@ if(DEBUG_MODE)
 else
 	error_reporting(0);
 
+if(($_SERVER['SCRIPT_NAME']) == '/')
+    define('BASE_URL', '');
+else
+    define('BASE_URL', dirname($_SERVER['SCRIPT_NAME']) . '/');
+
 define('SYS_PATH', 			'kow_system/');
 define('APP_PATH', 			'kow_app/');
 

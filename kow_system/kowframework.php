@@ -241,7 +241,7 @@ class kow_Framework
         foreach($this->get('config', 'autoload_helpers') as $v)
         	$c->load()->helper($v, true);
 
-        kow_Framework::run_hook('pre_render');
+        self::run_hook('pre_render');
         call_user_func_array(array($c, $this->get('router', 'action')), array($this->get('router', 'params')));
 
         return $c;
