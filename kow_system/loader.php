@@ -97,7 +97,7 @@ class kow_Loader
 	// Est-ce qu'on supporte les thèmes handler par les plugins ??
 	public function theme($layoutContent)
 	{
-		$theme = THEMES_PATH . $this->_theme_path . '/' . 'default.php';
+		$theme = THEMES_PATH . $this->_theme_path . '/' . 'default' . EXT;
 
 		if(!file_exists($theme))
 			throw new Exception('Le fichier de thème par défaut "' . $theme . '" n\'existe pas.');
