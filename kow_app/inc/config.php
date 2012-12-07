@@ -27,7 +27,7 @@ if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
  * Si désactivé : http://localhost/kowframework/index.php?p=page/index
  * Par défaut : false (désactivé)
  */
-$config['enable_url_rewriting'] = true;
+$config['enable_url_rewriting'] = false;
 
 /**
  * Contrôleur et action utilisé par défaut
@@ -59,12 +59,12 @@ $config['timezone'] = 'Europe/Zurich';
  * Activer (true) ou désactiver (false) le système de plugin
  * Par défaut : false (désactivé)
  */
-$config['enable_plugins'] = true;
+$config['enable_plugins'] = false;
 
 /**
  * Liste des plugins à charger
  */
-$config['plugins'] = array('topsite/topsite');
+$config['plugins'] = array();
 
 /**
  * Chargement automatique des helpers spéficié ci-dessous
