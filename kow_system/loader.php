@@ -25,6 +25,7 @@ class kow_Loader
 	private $_action = '';
 	private $_theme_path = '';
 	private $_plugin_handled = false;
+	private $_plugin_use_controllers = false;
 
 	public function __construct()
 	{
@@ -33,6 +34,7 @@ class kow_Loader
 		$this->_action = $kwf->get('router', 'action');
 		$this->_theme_path = $kwf->get('config', 'theme_path');
 		$this->_plugin_handled = $kwf->get('config', 'plugin_handled', false);
+		$this->_plugin_use_controllers = $kwf->get('config', 'plugin_use_controllers', false);
 	}
 
 	public function model($model, $database)
@@ -40,7 +42,7 @@ class kow_Loader
 		if($model !== false)
 		{
 			if($this->_plugin_handled)
-				$model_path = PLUGINS_PATH . $this->_plugin_handled . '/models/' . $this->_action . EXT;
+				$model_path = ($this->_plugin_use_controllers) ? PLUGINS_PATH . $this->_plugin_handled . '/models/' . $this->_controller . '/' . $this->_action . EXT : PLUGINS_PATH . $this->_plugin_handled . '/models/' . $this->_action . EXT;
 			else
 				$model_path = MODELS_PATH . $this->_controller . '/' . $this->_action . EXT;
 
@@ -64,7 +66,11 @@ class kow_Loader
 
 	public function view($view = null)
 	{
-		$path_view = ($this->_plugin_handled) ? PLUGINS_PATH . $this->_plugin_handled . '/views' : VIEWS_PATH . $this->_controller;
+		if($this->_plugin_handled)
+			$path_view = ($this->_plugin_use_controllers) ? PLUGINS_PATH . $this->_plugin_handled . '/views/' . $this->_controller : PLUGINS_PATH . $this->_plugin_handled . '/views';
+		else
+			$path_view = ($this->_plugin_handled) ? PLUGINS_PATH . $this->_plugin_handled . '/views' : VIEWS_PATH . $this->_controller;
+
 		if(is_null($view))
 			$view = $path_view . '/' . $this->_action . EXT;
 		else

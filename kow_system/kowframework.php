@@ -95,12 +95,47 @@ class kow_Framework
 			return null;
 	}
 
-	static function handle_by_plugin($name = null)
+	public function replace($category, $key, $value = null)
 	{
-		if($name)
-			kow_Framework::get_instance()->set('config', 'plugin_handled', $name);
+		if(is_null($value))
+			$this->_vars[$category] = $key;
 		else
-			return kow_Framework::get_instance()->get('config', 'plugin_handled', false);
+			$this->_vars[$category][$key] = $value;
+	}
+
+	static function handle_by_plugin()
+	{
+		return kow_Framework::get_instance()->get('config', 'plugin_handled', false);
+	}
+
+	static function set_handle_by_plugin($name, $settings = null)
+	{
+		$kfw = kow_Framework::get_instance();
+
+		if(is_array($settings) and isset($settings['use_controllers']))
+		{
+			if($controller = $kfw->get('router', 'action', false))
+				$kfw->replace('router', 'controller', $controller);
+			else if(isset($settings['default_controller']))
+				$kfw->replace('router', 'controller', $settings['default_controller']);
+			else
+				$kfw->replace('router', 'controller', $kfw->get('config', 'default_controller'));
+
+			if($params = $kfw->get('router', 'params', false))
+			{
+				$kfw->replace('router', 'action', current($params));
+				array_shift($params);
+				$kfw->replace('router', 'params', $params);
+			}
+			else if(isset($settings['default_view']))
+				$kfw->replace('router', 'action', $settings['default_action']);
+			else
+				$kfw->replace('router', 'action', $kfw->get('config', 'default_action'));
+
+			$kfw->set('config', 'plugin_use_controllers', true);
+		}
+
+		$kfw->set('config', 'plugin_handled', $name);
 	}
 
 	public static function auto_load($class)
@@ -215,8 +250,7 @@ class kow_Framework
 		$this->set('router', array(
 			'controller'	=> $controller,
 			'action'		=> $action,
-			'params' 		=> $params,
-			'routes'		=> array()
+			'params' 		=> $params
 		));
 
 		self::run_hook('post_route', $this->get('router'));
@@ -225,11 +259,13 @@ class kow_Framework
 	public function dispatch()
 	{
 		$controller_path = ($this->get('config', 'plugin_handled', false)) ? PLUGINS_PATH . $this->get('config', 'plugin_handled', false) . '/' : CONTROLLERS_PATH;
+
 		if(!file_exists($controller_path . $this->get('router', 'controller') . EXT))
 			$this->set('router', 'controller', $this->get('config', 'default_controller'));
 
 		$controller_class = 'Controller_' . ucfirst($this->get('router', 'controller'));
 
+		// Todo : 404 error handler shouln't be dependent from an app controller and action 
 		if(!in_array($this->get('router', 'action'), array_diff(
 			get_class_methods($controller_class),
 			get_class_methods(get_parent_class($controller_class)))
