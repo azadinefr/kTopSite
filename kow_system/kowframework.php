@@ -19,7 +19,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define('KOWFRAMEWORK', '1.0.12');
+define('KOWFRAMEWORK', '1.0.13');
 
 require_once SYS_PATH . 'exception' . EXT;
 
@@ -38,7 +38,7 @@ class kow_Framework
 	private $_vars = array();
 	private $_hook_list = array('post_route', 'pre_render', 'post_render');
 
-	public function __construct()
+	private function __construct()
 	{
 		self::$_instance = &$this;
 
@@ -55,15 +55,21 @@ class kow_Framework
 
 		$this->set('config', $config);
 		$this->load_plugins();
-		
-		$this->route();
-		$c = $this->dispatch();
-		$c->render();
 	}
 
 	public static function &get_instance()
 	{
+		if(is_null(self::$_instance))
+			self::$_instance = new kow_Framework;
+
 		return self::$_instance;
+	}
+
+	public function run()
+	{
+		$this->route();
+		$c = $this->dispatch();
+		$c->render();
 	}
 
 	public function set($category, $key, $value = null, $force_array = false)

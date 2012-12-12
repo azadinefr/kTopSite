@@ -50,4 +50,4 @@ define('EXT', 				'.php');
 session_start();
 
 require_once SYS_PATH . 'kowframework.php';
-new kow_Framework();
+kow_Framework::get_instance()->run();
