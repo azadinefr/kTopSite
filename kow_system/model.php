@@ -3,7 +3,7 @@
 if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
 
 /**
- * Copyright (C) 2011-2012 Kevin Ryser et Simon Baehler <http://framework.koweb.ch>
+ * Copyright (C) 2011-2012 Kevin Ryser <http://framework.koweb.ch>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
