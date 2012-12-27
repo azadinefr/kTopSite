@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
+if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
 
 /**
  * Copyright (C) 2011-2012 Kevin Ryser <http://framework.koweb.ch>

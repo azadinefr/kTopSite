@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
+if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
 
 /**
  * Copyright (C) 2011-2012 Kevin Ryser <http://framework.koweb.ch>
@@ -37,6 +37,27 @@ class kow_Loader
 		$this->_plugin_use_controllers = $kwf->get('config', 'plugin_use_controllers', false);
 	}
 
+	public function library($name)
+	{
+		$name = explode(SEP, strtolower($name));
+
+		if(sizeof($name) > 1)
+		{
+			$lib = ucfirst(end($name));
+			$path = APP_PATH;
+			foreach($name as $v)
+				$path .= SEP . $v;
+		}
+		else
+		{
+			$lib = ucfirst($name[0]);
+			$path = LIBS_PATH . $name[0];
+		}
+
+		require_once($path . EXT);
+		return new $lib;
+	}
+
 	public function model($model, $database)
 	{
 		if($model !== false)
@@ -61,6 +82,7 @@ class kow_Loader
 				throw new Exception('Le modèle "' . $model_path . '" pour l\'action "' . $this->_action . '" du contrôleur "' . $this->_controller . ' n\'existe pas."');
 		}
 
+		require_once SYS_PATH . 'model' . EXT;
 		return new kow_Model($database);
 	}
 

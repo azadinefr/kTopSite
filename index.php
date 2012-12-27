@@ -32,22 +32,28 @@ if(($_SERVER['SCRIPT_NAME']) == '/')
 else
     define('BASE_URL', dirname($_SERVER['SCRIPT_NAME']) . '/');
 
-define('SYS_PATH', 			'kow_system/');
-define('APP_PATH', 			'kow_app/');
-
-define('CONFIG_PATH', 		APP_PATH . 'inc/config.php');
-
-define('MODELS_PATH', 		APP_PATH . 'models/');
-define('VIEWS_PATH', 		APP_PATH . 'views/');
-define('CONTROLLERS_PATH', 	APP_PATH . 'controllers/');
-
-define('HELPERS_PATH', 		APP_PATH . 'helpers/');
-define('PLUGINS_PATH',		APP_PATH . 'plugins/');
-define('THEMES_PATH', 		APP_PATH . 'themes/');
-
 define('EXT', 				'.php');
+define('SEP',				'/');
+
+define('SYS_PATH', 			'kow_system/');
+define('APP_PATH', 			'kow_app');
+
+define('CONFIG_PATH', 		APP_PATH . SEP . 'inc/config' . EXT);
+
+define('MODELS_PATH', 		APP_PATH .  SEP . 'models/');
+define('VIEWS_PATH', 		APP_PATH .  SEP . 'views/');
+define('CONTROLLERS_PATH', 	APP_PATH .  SEP . 'controllers/');
+
+define('HELPERS_PATH', 		APP_PATH .  SEP . 'helpers/');
+define('LIBS_PATH',			APP_PATH .  SEP . 'librairies/');
+define('PLUGINS_PATH',		APP_PATH .  SEP . 'plugins/');
+define('THEMES_PATH', 		APP_PATH .  SEP . 'themes/');
 
 session_start();
 
-require_once SYS_PATH . 'kowframework.php';
+require_once SYS_PATH . 'controller' . EXT;
+require_once SYS_PATH . 'exception' . EXT;
+require_once SYS_PATH . 'loader' . EXT;
+require_once SYS_PATH . 'kowframework' . EXT;
+
 kow_Framework::get_instance()->run();

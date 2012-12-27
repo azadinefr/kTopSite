@@ -21,11 +21,8 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
 
 define('KOWFRAMEWORK', '1.0.15');
 
-require_once SYS_PATH . 'exception' . EXT;
-
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
-spl_autoload_register(array('kow_Framework', 'auto_load'));
 
 function kfw_version()
 {
@@ -144,30 +141,6 @@ class kow_Framework
 		$kfw->set('config', 'plugin_handled', $name);
 	}
 
-	public static function auto_load($class)
-	{
-		$file = explode('_', strtolower($class));
-
-		if(empty($file[0]) or empty($file[1]))
-			return;
-
-		if($file[0] == 'kow')
-			$file = SYS_PATH . $file[1] . EXT;
-		else
-		{
-			$path = (self::handle_by_plugin()) ? PLUGINS_PATH . self::handle_by_plugin() . '/' : APP_PATH;
-			if(substr($file[0], -1) == 's')
-				$file = $path . $file[0] . '/' . $file[1] . EXT;
-			else
-				$file = $path . $file[0] . 's/' . $file[1] . EXT;
-		}
-
-		if(file_exists($file))
-			require_once $file;
-		else
-			throw new Exception('Le fichier "' . $file . '" n\'existe pas. Tentative d\'inclusion pour la classe "' . $class . '"');
-	}
-
 	public function load_plugins()
 	{
 		if($this->get('config', 'enable_plugins'))
@@ -269,6 +242,7 @@ class kow_Framework
 		if(!file_exists($controller_path . $this->get('router', 'controller') . EXT))
 			$this->set('router', 'controller', $this->get('config', 'default_controller'));
 
+		require_once $controller_path . $this->get('router', 'controller') . EXT;
 		$controller_class = 'Controller_' . ucfirst($this->get('router', 'controller'));
 
 		// Todo : 404 error handler shouln't be dependent from an app controller and action 
