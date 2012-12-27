@@ -38,7 +38,10 @@ function img_path($image)
 
 function redirect($url)
 {
-	header('Location: ' . $url);
+	if(URL_REWRITING_ENABLED)
+		header('Location: ' . BASE_URL . $url);
+	else
+		header('Location: index.php?p=' . $url);
 }
 
 function css($name)

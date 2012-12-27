@@ -19,7 +19,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define('KOWFRAMEWORK', '1.0.14');
+define('KOWFRAMEWORK', '1.0.15');
 
 require_once SYS_PATH . 'exception' . EXT;
 
