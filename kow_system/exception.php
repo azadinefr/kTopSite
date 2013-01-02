@@ -36,6 +36,9 @@ class kow_Exception
 			case E_NOTICE:
 				$type = 'Remarque : ';
 				break;
+			case E_STRICT:
+				$type = 'Normes strictes : ';
+				break;
 			default :
 				$type = 'Inconnu : ';
 				break;
