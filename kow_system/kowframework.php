@@ -200,7 +200,7 @@ class kow_Framework
 		kow_Framework::get_instance()->set('hooks', $hook_name, $function, true);
 	}
 
-	public static function run_hook($hook_name, &$arguments = array())
+	public static function run_hook($hook_name, $arguments = array())
 	{
 		$hook_list = kow_Framework::get_instance()->get('hooks', $hook_name, false);
 

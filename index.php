@@ -21,7 +21,7 @@ define('DEBUG_MODE', true);
 
 if(DEBUG_MODE)
 {
-	error_reporting(E_ALL);
+	error_reporting(E_ALL | E_STRICT);
 	ini_set('display_errors', 'On');
 }
 else
