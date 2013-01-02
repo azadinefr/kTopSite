@@ -3,24 +3,15 @@
 if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
 
 /**
- * Copyright (C) 2011-2012 Kevin Ryser <http://framework.koweb.ch>
+ * New BSD License
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2011-2013 Kevin Ryser (http://framework.koweb.ch) All rights reserved
+ * See the LICENSE file for the full license text.
  */
 
 class kow_Loader
 {
+	private $_kfw = null;
 	private $_controller = '';
 	private $_action = '';
 	private $_theme_path = '';
@@ -29,12 +20,12 @@ class kow_Loader
 
 	public function __construct()
 	{
-		$kwf = kow_Framework::get_instance();
-		$this->_controller = $kwf->get('router', 'controller');
-		$this->_action = $kwf->get('router', 'action');
-		$this->_theme_path = $kwf->get('config', 'theme_path');
-		$this->_plugin_handled = $kwf->get('config', 'plugin_handled', false);
-		$this->_plugin_use_controllers = $kwf->get('config', 'plugin_use_controllers', false);
+		$this->_kfw =& kow_Framework::get_instance();
+		$this->_controller = $this->_kfw->get('router', 'controller');
+		$this->_action = $this->_kfw->get('router', 'action');
+		$this->_theme_path = $this->_kfw->get('config', 'theme_path');
+		$this->_plugin_handled = $this->_kfw->get('config', 'plugin_handled', false);
+		$this->_plugin_use_controllers = $this->_kfw->get('config', 'plugin_use_controllers', false);
 	}
 
 	public function library($name)
@@ -43,19 +34,29 @@ class kow_Loader
 
 		if(sizeof($name) > 1)
 		{
-			$lib = ucfirst(end($name));
+			$lib_name = ucfirst(end($name));
 			$path = APP_PATH;
 			foreach($name as $v)
 				$path .= SEP . $v;
 		}
 		else
 		{
-			$lib = ucfirst($name[0]);
+			$lib_name = ucfirst($name[0]);
 			$path = LIBS_PATH . $name[0];
 		}
 
+		if($this->_kfw->get('kow_Library', $lib_name, false))
+			return $this->_kfw->get('kow_Library', $lib_name, false);
+
 		require_once($path . EXT);
-		return new $lib;
+
+		if($settings)
+			$lib = new $lib_name($settings);
+		else
+			$lib = new $lib_name;
+
+		$this->_kfw->set('kow_Library', $lib_name, $lib);
+		return $lib;
 	}
 
 	public function model($model, $database)
@@ -106,7 +107,7 @@ class kow_Loader
         		$view = VIEWS_PATH . $this->_controller . '/' . kow_Framework::get_instance()->get('config', 'default_error404_view') . EXT;
         }
 
-        kow_Controller::get_instance()->set_view($view);
+        $this->_kfw->get('kow_Controller', 'instance')->set_view($view);
 	}
 
 	public function helper($helper, $force_default_path = false)
