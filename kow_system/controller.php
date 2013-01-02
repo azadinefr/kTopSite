@@ -22,7 +22,7 @@ class kow_Controller
 	public function __construct()
 	{
 		$this->_kfw =& kow_Framework::get_instance();
-		$this->_load =& $this->_kfw->get('kow_Loader', 'instance');
+		$this->_load = $this->_kfw->get('kow_Loader', 'instance');
 	}
 
 	public function __set($key, $value)
@@ -76,16 +76,24 @@ class kow_Controller
 	public function model($database, $model = null)
 	{
 		if($model === false)
-			$index = 0;
+			$index = 0; // don't charge any model
 		else if($model === null)
-			$index = $this->_view;
+			$index = $this->_view; // charge default model
 		else
-			$index = $model;
+			$index = $model; // charge model given
 
-		if(empty($this->_model[$database][$index]))
-			$this->_model[$database][$index] = $this->_load->model($model, $database);
-
-		return $this->_model[$database][$index];
+		$models = $this->_kfw->get('kow_Model', 'models', false);
+		if(!empty($models[$model]))
+		{
+			echo 'Model déjà chargé<br />';
+			$model = $models[$model];
+		}
+		else
+		{
+			echo 'Chargement du modèle';
+			$model = $this->_load->model($model, $database);
+		}
+		return $model;
 	}
 
 	public function render()

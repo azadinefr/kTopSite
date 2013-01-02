@@ -61,6 +61,12 @@ class kow_Loader
 
 	public function model($model, $database)
 	{
+		if(!$this->_kfw->get('kow_Model', 'included', false))
+		{
+			require_once SYS_PATH . 'model' . EXT;
+			$this->_kfw->set('kow_Model', 'included', true);
+		}
+
 		if($model !== false)
 		{
 			if($this->_plugin_handled)
@@ -77,14 +83,16 @@ class kow_Loader
 			{
 				require_once $model_path;
 				if(class_exists($model))
-					return new $model($database);
+					$model_object = new $model($database);
 			}
 			else
 				throw new Exception('Le modèle "' . $model_path . '" pour l\'action "' . $this->_action . '" du contrôleur "' . $this->_controller . ' n\'existe pas."');
 		}
+		else
+			$model_object = new kow_Model($database);
 
-		require_once SYS_PATH . 'model' . EXT;
-		return new kow_Model($database);
+		$this->_kfw->set('kow_Model', 'models', array($model => $model_object));
+		return $model_object;
 	}
 
 	public function view($view = null)

@@ -21,19 +21,28 @@ class kow_Model
 
 	function __construct($database)
 	{
-		$db = kow_Framework::get_instance()->get('config', 'database');
-		if(empty($db[$database]))
-			throw new Exception('Les informations de connexion à la base de données "' . $database . '" n\'existe pas.');
-			
-		$db = $db[$database];
+		$connections = kow_Framework::get_instance()->get('kow_Model', 'connections', false);
 
-		try
+		if($connections and !empty($connections[$database]))
+			$this->_db = $connections[$database];
+		else
 		{
-			$this->_db = new PDO('mysql:host=' . $db['host'] . ';port=' . $db['port'] . ';dbname=' . $db['database'] . ';', $db['username'], $db['password'], isset($db['options']) ? $db['options'] : array());
-		}
-		catch(PDOException $e)
-		{
-			throw new Exception('Erreur lors de la connexion à la base de données "' . $db['database'] . '" : ' . $e->getMessage());
+			$db = kow_Framework::get_instance()->get('config', 'database', false);
+			if(!isset($db[$database]) or !is_array($db[$database]))
+				throw new Exception('Les informations de connexion à la base de données "' . $database . '" n\'existe pas.');
+
+			$db = $db[$database];
+
+			try
+			{
+				$this->_db = new PDO('mysql:host=' . $db['host'] . ';port=' . $db['port'] . ';dbname=' . $database . ';', $db['username'], $db['password'], isset($db['options']) ? $db['options'] : array());
+
+				kow_Framework::get_instance()->set('kow_Model', 'connections', array($database => $this->_db));
+			}
+			catch(PDOException $e)
+			{
+				throw new Exception('Erreur lors de la connexion à la base de données "' . $db['database'] . '" : ' . $e->getMessage());
+			}
 		}
 
 		return $this;
