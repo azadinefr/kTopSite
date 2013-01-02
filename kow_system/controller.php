@@ -75,24 +75,12 @@ class kow_Controller
 
 	public function model($database, $model = null)
 	{
-		if($model === false)
-			$index = 0; // don't charge any model
-		else if($model === null)
-			$index = $this->_view; // charge default model
-		else
-			$index = $model; // charge model given
-
 		$models = $this->_kfw->get('kow_Model', 'models', false);
 		if(!empty($models[$model]))
-		{
-			echo 'Model déjà chargé<br />';
 			$model = $models[$model];
-		}
 		else
-		{
-			echo 'Chargement du modèle';
 			$model = $this->_load->model($model, $database);
-		}
+
 		return $model;
 	}
 
