@@ -12,17 +12,15 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
 class kow_Controller
 {
 	private $_kfw = null;
-	private $_load = null;
 	private $_vars = array();
-	private $_model = array();
 	private $_request = array();
 	private $_view = null;
 	private $_rendered = false;
+	private $_template_name = null;
 
 	public function __construct()
 	{
 		$this->_kfw =& kow_Framework::get_instance();
-		$this->_load = $this->_kfw->get('kow_Loader', 'instance');
 	}
 
 	public function __set($key, $value)
@@ -36,6 +34,14 @@ class kow_Controller
 			return $this->_vars[$key];
 		else
 			throw new Exception('Le paramètre "' . $key . '" n\'existe pas.');
+	}
+
+	public function template_name($name = null)
+	{
+		if($name)
+			$this->_template_name = $name;
+		else
+			return $this->_template_name; 
 	}
 
 	public function request($method)
@@ -70,7 +76,17 @@ class kow_Controller
 
 	public function load()
 	{
-		return $this->_load;
+		return $this->_kfw->get('kow_Loader', 'instance');
+	}
+
+	public function load_my()
+	{
+		return $this->_kfw->get('kow_Loader', 'instance')->set_current_module($this->_my_infos);
+	}
+
+	public function kfw()
+	{
+		return $this->_kfw;
 	}
 
 	public function model($database, $model = null)
@@ -79,7 +95,7 @@ class kow_Controller
 		if(!empty($models[$model]))
 			$model = $models[$model];
 		else
-			$model = $this->_load->model($model, $database);
+			$model = $this->load_my()->model($model, $database);
 
 		return $model;
 	}
@@ -89,20 +105,15 @@ class kow_Controller
         if($this->_rendered)
             return;
 
-        $this->load()->view($this->_view);
+        $this->load_my()->view($this->_view);
         extract($this->_vars);
 
         ob_start();
 		require_once $this->_view;
-		$layoutContent = ob_get_clean();
+		$content = ob_get_contents();
+		ob_end_clean();
 
-		ob_start();
-		require_once $this->load()->theme($layoutContent);
-        $content = ob_get_clean();
-        
-        kow_Framework::run_hook('post_render', $content);
-
-        echo $content;
         $this->_rendered = true;
+        return $content;
 	}
 }

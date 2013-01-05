@@ -40,14 +40,11 @@ define('APP_PATH', 			'kow_app');
 
 define('CONFIG_PATH', 		APP_PATH . SEP . 'inc/config' . EXT);
 
-define('MODELS_PATH', 		APP_PATH .  SEP . 'models/');
-define('VIEWS_PATH', 		APP_PATH .  SEP . 'views/');
-define('CONTROLLERS_PATH', 	APP_PATH .  SEP . 'controllers/');
-
-define('HELPERS_PATH', 		APP_PATH .  SEP . 'helpers/');
-define('LIBS_PATH',			APP_PATH .  SEP . 'librairies/');
-define('PLUGINS_PATH',		APP_PATH .  SEP . 'plugins/');
-define('THEMES_PATH', 		APP_PATH .  SEP . 'themes/');
+define('HELPERS_PATH', 		APP_PATH . SEP . 'helpers/');
+define('HOOKS_PATH', 		APP_PATH . SEP . 'hooks/');
+define('LIBS_PATH',			APP_PATH . SEP . 'libraries/');
+define('MODULES_PATH',		APP_PATH . SEP . 'modules/');
+define('THEMES_PATH', 		APP_PATH . SEP . 'themes/');
 
 session_start();
 

@@ -7,7 +7,7 @@
     </head>
     <body>
 
-		<?php echo $layoutContent; ?>
+		<?php echo $layout_content; ?>
 
 	    <footer>
 	    	kowFramework 2011-2012 Kevin Ryser | <img src="<?php img_path('powered.png'); ?>" alt="Propulsé par kowFramework" />

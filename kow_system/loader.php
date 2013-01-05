@@ -12,50 +12,70 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
 class kow_Loader
 {
 	private $_kfw = null;
-	private $_controller = '';
-	private $_action = '';
+	private $_module = null;
+
 	private $_theme_path = '';
-	private $_plugin_handled = false;
-	private $_plugin_use_controllers = false;
 
 	public function __construct()
 	{
 		$this->_kfw =& kow_Framework::get_instance();
-		$this->_controller = $this->_kfw->get('router', 'controller');
-		$this->_action = $this->_kfw->get('router', 'action');
 		$this->_theme_path = $this->_kfw->get('config', 'theme_path');
-		$this->_plugin_handled = $this->_kfw->get('config', 'plugin_handled', false);
-		$this->_plugin_use_controllers = $this->_kfw->get('config', 'plugin_use_controllers', false);
 	}
 
-	public function library($name)
+	public function set_current_module($module)
 	{
-		$name = explode(SEP, strtolower($name));
+		$this->_module = $module;
+		return $this;
+	}
 
-		if(sizeof($name) > 1)
-		{
-			$lib_name = ucfirst(end($name));
-			$path = APP_PATH;
-			foreach($name as $v)
-				$path .= SEP . $v;
-		}
+	public function helper($helper)
+	{
+		if(is_array($helper))
+			foreach($helper as $h)
+				$this->helper($h);
+
+		if($this->_module['module'])
+			$path = MODULES_PATH . $this->_module['module'] . SEP . 'helpers' . SEP . $helper . EXT;
 		else
-		{
-			$lib_name = ucfirst($name[0]);
-			$path = LIBS_PATH . $name[0];
-		}
+			$path = HELPERS_PATH . $helper . EXT;
 
-		if($this->_kfw->get('kow_Library', $lib_name, false))
-			return $this->_kfw->get('kow_Library', $lib_name, false);
+		if(is_file($path))
+			require_once $path;
+		else
+			throw new Exception('Le helper "' . $path . '" n\'existe pas.');
+
+		$this->_module = null;
+	}
+
+	public function library($library)
+	{
+		if($this->_module)
+			$path = MODULES_PATH . $this->_module['module'] . SEP . 'libraries' . SEP . $library;
+		else
+			$path = LIBS_PATH . $library;
+
+		$lib_name = ucfirst($library);
+		$lib_index = ($this->_module) ? $this->_module['module'] . SEP . $lib_name : $lib_name;
+
+		if(func_num_args() > 1)
+			$params = current(array_slice(func_get_args(), 1));
+
+		if($this->_kfw->get('kow_Library', $lib_index, false))
+			return $this->_kfw->get('kow_Library', $lib_index, false);
+
+		if(class_exists($lib_name))
+			throw new Exception('Une classe du même nom "' . $lib_name . '" est déjà instanciée. Vivement les namespaces.');
 
 		require_once($path . EXT);
 
-		if($settings)
-			$lib = new $lib_name($settings);
+		if(isset($params))
+			$lib = new $lib_name($params);
 		else
 			$lib = new $lib_name;
 
-		$this->_kfw->set('kow_Library', $lib_name, $lib);
+		$this->_kfw->set('kow_Library', $lib_index, $lib);
+		$this->_module = null;
+
 		return $lib;
 	}
 
@@ -69,82 +89,75 @@ class kow_Loader
 
 		if($model !== false)
 		{
-			if($this->_plugin_handled)
-				$model_path = ($this->_plugin_use_controllers) ? PLUGINS_PATH . $this->_plugin_handled . '/models/' . $this->_controller . '/' . $this->_action . EXT : PLUGINS_PATH . $this->_plugin_handled . '/models/' . $this->_action . EXT;
-			else
-				$model_path = MODELS_PATH . $this->_controller . '/' . $this->_action . EXT;
+			$model_path = MODULES_PATH . $this->_module['module'] . SEP . 'models' . SEP . $this->_module['controller'] . SEP . $this->_module['action'] . EXT;
+			
+			if($this->_module['module'] == $this->_module['controller'])
+				if(is_file(MODULES_PATH . $this->_module['module'] . SEP . 'models' . SEP . $this->_module['action'] . EXT))
+					$model_path = MODULES_PATH . $this->_module['module'] . SEP . 'models' . SEP . $this->_module['action'] . EXT;
 
 			if(!empty($model))
-				$model_path = MODELS_PATH . $this->_controller . '/' . $model . EXT;
+				$model_path = MODELS_PATH . $this->_module['module'] . SEP . $model . EXT;
 			else
-				$model = $this->_action;
+				$model =  $this->_module['action'];
 
-			if(file_exists($model_path))
+			if(is_file($model_path))
 			{
 				require_once $model_path;
 				if(class_exists($model))
 					$model_object = new $model($database);
 			}
 			else
-				throw new Exception('Le modèle "' . $model_path . '" pour l\'action "' . $this->_action . '" du contrôleur "' . $this->_controller . ' n\'existe pas."');
+				throw new Exception('Le modèle "' . $model_path . '" pour l\'action "' . $this->_module['action'] . '" du contrôleur "' . $this->_module['controller'] . ' n\'existe pas."');
 		}
 		else
 			$model_object = new kow_Model($database);
 
 		$this->_kfw->set('kow_Model', 'models', array($model => $model_object));
+		$this->_module = null;
 		return $model_object;
 	}
 
 	public function view($view = null)
 	{
-		if($this->_plugin_handled)
-			$path_view = ($this->_plugin_use_controllers) ? PLUGINS_PATH . $this->_plugin_handled . '/views/' . $this->_controller : PLUGINS_PATH . $this->_plugin_handled . '/views';
-		else
-			$path_view = ($this->_plugin_handled) ? PLUGINS_PATH . $this->_plugin_handled . '/views' : VIEWS_PATH . $this->_controller;
-
 		if(is_null($view))
-			$view = $path_view . '/' . $this->_action . EXT;
+		{
+			$view = MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $this->_module['controller'] . SEP . $this->_module['action'] . EXT;
+			
+			if($this->_module['module'] == $this->_module['controller'])
+				if(is_file(MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $this->_module['action'] . EXT))
+					$view = MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $this->_module['action'] . EXT;
+		}
 		else
-	    	$view = $path_view .  '/' . $view . EXT;
+	    	$view = MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $view . EXT;
 
-        if(!file_exists($view))
+        if(!is_file($view))
         {
         	if(DEBUG_MODE)
-        		throw new Exception('La vue "' . $view . '" pour l\'action "' . $this->_action . '" du contrôleur "' . $this->_controller . '" n\'existe pas.');
+        		throw new Exception('La vue "' . $view . '" pour l\'action "' . $this->_module['action'] . '" du contrôleur "' . $this->_module['controller'] . '" n\'existe pas.');
         	else
-        		$view = VIEWS_PATH . $this->_controller . '/' . kow_Framework::get_instance()->get('config', 'default_error404_view') . EXT;
+        		$this->template('404', $this->_kfw->get('config', 'show_404_master'));
         }
 
-        $this->_kfw->get('kow_Controller', 'instance')->set_view($view);
+        $this->_kfw->get('kow_Modules', $this->_module['module'])->set_view($view);
+        $this->_module = null;
 	}
 
-	public function helper($helper, $force_default_path = false)
+	public function template($template, $include_in_master = true)
 	{
-		if(!$force_default_path and $this->_plugin_handled)
-			$helper_path =  PLUGINS_PATH . $this->_plugin_handled . '/helpers/' . $helper . EXT;
-		else
-			$helper_path  = HELPERS_PATH . $helper . EXT;
+		$template = THEMES_PATH . $this->_theme_path . SEP . 'templates' . SEP . $template . EXT;
 
-		if(file_exists($helper_path))
-			require_once $helper_path;
-		else
-			throw new Exception('Le helper "' . $helper_path . '" n\'existe pas.');
-	}
+		ob_start();
 
-	// Est-ce qu'on supporte les thèmes handler par les plugins ??
-	public function theme($layoutContent)
-	{
-		$theme = THEMES_PATH . $this->_theme_path . '/' . 'default' . EXT;
+		if($this->_kfw->get('kow_Templates', null, false))
+			extract($this->_kfw->get('kow_Templates', null, false));
 
-		if(!file_exists($theme))
-			throw new Exception('Le fichier de thème par défaut "' . $theme . '" n\'existe pas.');
+		require_once $template;
+        $content = ob_get_clean();
 
-		if(file_exists(THEMES_PATH . $this->_theme_path . '/templates/' . $this->_controller . EXT))
-			$theme = THEMES_PATH . $this->_theme_path . '/templates/' . $this->_controller . EXT;
-
-		if(file_exists(THEMES_PATH . $this->_theme_path . '/templates/' . $this->_controller . '_' . $this->_action . EXT))
-			$theme = THEMES_PATH . $this->_theme_path . '/templates/' . $this->_controller . '_' . $this->_action . EXT;
-
-		return $theme;
-	}
+        if(!$include_in_master)
+        	die($content);
+ 
+ 		$this->_kfw->view($content);
+ 		$this->_module = null;
+ 	}
 }

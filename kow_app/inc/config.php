@@ -27,20 +27,20 @@ if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
  * Si désactivé : http://localhost/kowframework/index.php?p=page/index
  * Par défaut : false (désactivé)
  */
-$config['enable_url_rewriting'] = false;
+$config['enable_url_rewriting'] = true;
 
 /**
- * Contrôleur et action utilisé par défaut
- * Par défaut : page/index
+ * Module (contrôleur) par défaut
+ * Par défaut : page
  */
 $config['default_controller'] = 'page';
-$config['default_action'] = 'index';
 
 /**
- * Vue par défaut en cas d'erreur 404 (page demandée inexistante)
- * Par défaut : vue error_404 du contrôleur par défaut (page/error_404)
+ * Affiche le template "404" dans le template principal
+ * Si false, affiche dans une nouvelle page
+ * Par défaut : true
  */
-$config['default_error404_view'] = 'error404';
+$config['show_404_master'] = true;
 
 /**
  * Nom du thème (= nom du dossier contenant le thème)
@@ -59,12 +59,12 @@ $config['timezone'] = 'Europe/Zurich';
  * Activer (true) ou désactiver (false) le système de plugin
  * Par défaut : false (désactivé)
  */
-$config['enable_plugins'] = false;
+$config['enable_hooks'] = false;
 
 /**
  * Liste des plugins à charger
  */
-$config['plugins'] = array();
+$config['hooks'] = array();
 
 /**
  * Chargement automatique des helpers spéficié ci-dessous
@@ -77,10 +77,11 @@ $config['autoload_helpers'] = array('url', 'alert');
  */
 /*
 $config['database'] = array(
-		'default' => array(
+
+		// database name 
+		'kowframework' => array(
 			'host' 		=> 'localhost',
 			'port'		=> 3306,
-			'database'	=> '',
 			'username'	=> 'root',
 			'password'	=> '',
 			'options'	=> array(
