@@ -79,7 +79,7 @@ class kow_Loader
 		return $lib;
 	}
 
-	public function model($model, $database)
+	public function model($database, $model)
 	{
 		if(!$this->_kfw->get('kow_Model', 'included', false))
 		{

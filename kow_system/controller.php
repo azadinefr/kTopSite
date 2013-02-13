@@ -104,7 +104,7 @@ class kow_Controller
 		if(!empty($models[$model]))
 			$model = $models[$model];
 		else
-			$model = $this->load_my()->model($model, $database);
+			$model = $this->load_my()->model($database, $model);
 
 		return $model;
 	}
