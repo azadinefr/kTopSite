@@ -16,6 +16,7 @@ class kow_Controller
 	private $_request = array();
 	private $_view = null;
 	private $_rendered = false;
+	private $_is_script = false;
 	private $_template_name = null;
 
 	public function __construct()
@@ -64,9 +65,12 @@ class kow_Controller
 		return $this->_request[$method];
 	}
 
-	public function no_render()
+	public function is_script($is_script = null)
 	{
-		$this->_rendered = true;
+		if(is_bool($is_script))
+			$this->_is_script = $is_script;
+		else
+			return $this->_is_script;
 	}
 
 	public function set_view($view)
@@ -102,9 +106,6 @@ class kow_Controller
 
 	public function render()
 	{
-        if($this->_rendered)
-            return;
-
         $this->load_my()->view($this->_view);
         extract($this->_vars);
 

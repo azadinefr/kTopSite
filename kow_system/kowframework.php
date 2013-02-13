@@ -294,6 +294,9 @@ class kow_Framework
 
 					    $out = call_user_func_array(array($module_object, $action), array($params));
 
+					    if($module_object->is_script())
+					    	die($out);
+
 					    if($out === null)
 					    	$out = $module_object->render();
 
