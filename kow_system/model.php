@@ -48,7 +48,7 @@ class kow_Model
 		return $this;
 	}
 
-	public function database()
+	public function &database()
 	{
 		return $this->_db;
 	}
@@ -79,12 +79,10 @@ class kow_Model
             $param = PDO::PARAM_BOOL;
         elseif(is_null($value))
             $param = PDO::PARAM_NULL;
-        elseif(is_string($value))
-            $param = PDO::PARAM_STR;
         else
-            $param = FALSE;
+            $param = PDO::PARAM_STR;
 
-		if(!$param || !$this->_query->bindValue(++$this->_index, $value, $param))
+		if(!$this->_query->bindValue(++$this->_index, $value, $param))
 			$this->show_exception($this->_queryLog, 'index ' . $this->_index . ' valeur "'. $value .'"');
 
 		return $this;
