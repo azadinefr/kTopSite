@@ -6,7 +6,7 @@ $kfw_config = kow_Framework::get_instance()->get('config');
 define('THEME_PATH', $kfw_config['theme_path']);
 define('URL_REWRITING_ENABLED', $kfw_config['enable_url_rewriting']);
 
-function url_path($url)
+function url($url)
 {
 	if(URL_REWRITING_ENABLED)
 		echo BASE_URL . $url;
@@ -14,17 +14,25 @@ function url_path($url)
 		echo 'index.php?p=' . $url;
 }
 
-function img_path($image)
+function img($image)
 {
 	echo BASE_URL . THEMES_PATH . THEME_PATH . '/images/' .  $image;
 }
 
 function redirect($url)
 {
-	if(URL_REWRITING_ENABLED)
-		header('Location: ' . BASE_URL . $url);
+	$location = 'Location: ';
+	if(strpos($url, 'http') !== false)
+		$location .= $url;
 	else
-		header('Location: index.php?p=' . $url);
+	{
+		if(URL_REWRITING_ENABLED)
+			$location .= BASE_URL . $url;
+		else
+			$location .= $url;
+	}
+
+	header($location);
 }
 
 function css($name)
