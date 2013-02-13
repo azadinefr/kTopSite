@@ -65,6 +65,11 @@ class kow_Controller
 		return $this->_request[$method];
 	}
 
+	public function no_render()
+	{
+		$this->is_script(true);
+	}
+
 	public function is_script($is_script = null)
 	{
 		if(is_bool($is_script))
@@ -102,6 +107,11 @@ class kow_Controller
 			$model = $this->load_my()->model($model, $database);
 
 		return $model;
+	}
+
+	public function set_template_var($name, $var)
+	{
+		$this->kfw()->set_template_var($name, $var);
 	}
 
 	public function render()

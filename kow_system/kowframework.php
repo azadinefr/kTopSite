@@ -306,10 +306,10 @@ class kow_Framework
 					    	$render_name = $module;
 
 					    if($module == $this->get('router', 'controller'))
-					    	$this->set('kow_Templates', 'layout_content', $out);
+					    	$this->set_template_var('layout_content', $out);
 						
 					    else
-					    	$this->set('kow_Templates', $render_name, $out);
+					    	$this->set_template_var($render_name, $out);
 					    
 					    return;
 					}
@@ -320,6 +320,11 @@ class kow_Framework
 		// Faire un hook?
 		// manque header('HTTP/1.0 404 Not Found'); AUSSI !!!
 		$this->get('kow_Loader', 'instance')->template('404', $this->get('config', 'show_404_master'));
+	}
+
+	public function set_template_var($name, $var)
+	{
+	   	$this->set('kow_Templates', $name, $var);
 	}
 
 	public function view($template = null)

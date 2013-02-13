@@ -144,6 +144,10 @@ class kow_Loader
 
 	public function template($template, $include_in_master = true)
 	{
+		if(!$include_in_master)
+			if(is_file(THEMES_PATH . $this->_kfw->get('config', 'theme_path') . SEP . 'build' . EXT))
+				require_once THEMES_PATH . $this->_kfw->get('config', 'theme_path') . SEP . 'build' . EXT;
+
 		$template = THEMES_PATH . $this->_theme_path . SEP . 'templates' . SEP . $template . EXT;
 
 		ob_start();
@@ -152,7 +156,7 @@ class kow_Loader
 			extract($this->_kfw->get('kow_Templates', null, false));
 
 		require_once $template;
-        $content = ob_get_clean();
+		$content = ob_get_clean();
 
         if(!$include_in_master)
         	die($content);
