@@ -44,23 +44,23 @@ class kow_Controller
 			return $this->_template_name; 
 	}
 
-	public function request($method)
+	public function request($method = 'request')
 	{
-		$method = strtoupper($method);
-		if($method != 'POST' and $method != 'GET')
-			throw new Exception('Méthode "' . $method . '" iconnue. Choisir entre "GET" ou "POST".');
+		$method = strtolower($method);
+		if(isset($this->_request[$method]))
+			return $this->_request[$method];
 
-		if(empty($this->_request[$method]))
-		{
-			$this->_request[$method] = new StdClass;
-        	if($method == 'POST')
-        		foreach($_POST as $k => $v)
-            		$this->_request[$method]->$k = $v;
-            else
-        		foreach($_GET as $k => $v)
-            		$this->_request[$method]->$k = $v;
-		}
-			
+		$this->_request[$method] = new StdClass;
+    	if($method == 'POST')
+    		foreach($_POST as $k => $v)
+        		$this->_request[$method]->$k = $v;
+        else if($method == 'GET')
+    		foreach($_GET as $k => $v)
+        		$this->_request[$method]->$k = $v;
+  		else
+        	foreach($_REQUEST as $k => $v)
+        		$this->_request[$method]->$k = $v;
+
 		return $this->_request[$method];
 	}
 
