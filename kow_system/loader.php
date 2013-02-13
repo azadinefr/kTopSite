@@ -34,6 +34,9 @@ class kow_Loader
 			foreach($helper as $h)
 				$this->helper($h);
 
+		$helper = explode(SEP, $helper);
+		$helper = ucfirst(end($helper));
+
 		if($this->_module['module'])
 			$path = MODULES_PATH . $this->_module['module'] . SEP . 'helpers' . SEP . $helper . EXT;
 		else
@@ -54,7 +57,8 @@ class kow_Loader
 		else
 			$path = LIBS_PATH . $library;
 
-		$lib_name = ucfirst($library);
+		$lib_name = explode(SEP, $library);
+		$lib_name = ucfirst(end($lib_name));
 		$lib_index = ($this->_module) ? $this->_module['module'] . SEP . $lib_name : $lib_name;
 
 		if(func_num_args() > 1)
@@ -107,7 +111,7 @@ class kow_Loader
 					$model_object = new $model($database);
 			}
 			else
-				throw new Exception('Le modèle "' . $model_path . '" pour l\'action "' . $this->_module['action'] . '" du contrôleur "' . $this->_module['controller'] . ' n\'existe pas."');
+				throw new Exception('Le modèle "' . $model_path . '" pour l\'action "' . $this->_module['action'] . '" du contrôleur "' . $this->_module['controller'] . '" n\'existe pas.');
 		}
 		else
 			$model_object = new kow_Model($database);
