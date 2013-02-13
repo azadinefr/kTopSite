@@ -23,7 +23,6 @@ class kow_Framework
 {
 	private static $_instance = null;
 	private $_vars = array();
-	private $_hook_list = array('post_route', 'pre_render', 'post_render');
 
 	private function __construct()
 	{
@@ -126,27 +125,30 @@ class kow_Framework
 	{
 		if($this->get('config', 'enable_hooks'))
 		{
-			foreach($this->get('config', 'hooks') as $file)
+			foreach($this->get('config', 'hooks') as $file_path)
 			{
-				if(is_file(HOOKS_PATH . $file . EXT))
+				if(is_file(HOOKS_PATH . $file_path . EXT))
 				{
-					require_once HOOKS_PATH . $file . EXT;
-					$url = explode('/', $file);
-					$hook_class = end($url);
-					$hook_class = 'Hook_' . ucfirst($hook_class);
+					require_once HOOKS_PATH . $file_path . EXT;
+					$file = explode(SEP, $file_path);
+					$hook_class = 'Hook_' . ucfirst(strtolower(end($file)));
 
 					if(class_exists($hook_class, false))
 					{
-						if(method_exists($hook_class, 'load'))
-							call_user_func(array($hook_class, 'load'), $this->get('config'));
+						if(is_file(HOOKS_PATH . $file_path . SEP . 'config' . EXT))
+							require_once HOOKS_PATH . $file_path . SEP . 'config' . EXT;
+
+						if(method_exists($hook_class, '_load'))
+							call_user_func(array($hook_class, '_load'), isset($config) ? $config : null);
 ;
+						// hook function start with "_"
 						foreach(get_class_methods($hook_class) as $function)
-							if(in_array($function, $this->_hook_list))
-								$this->set('hooks', $function, array($hook_class, $function), true);
+							if($function[0] == '_')
+								$this->set('hooks', substr($function, 1), array($hook_class, $function), true);
 					}
 				}
 				else
-					throw new Exception('Le fichier hook "' . HOOKS_PATH . $file . EXT . '" n\'existe pas.');
+					throw new Exception('Le fichier hook "' . HOOKS_PATH . $file_path . EXT . '" n\'existe pas.');
 			}
 		}
 	}
