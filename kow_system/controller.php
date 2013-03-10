@@ -93,6 +93,13 @@ class kow_Controller
 		return $this->_kfw->get('kow_Loader', 'instance')->set_current_module($this->_my_infos);
 	}
 
+	public function load_his($module)
+	{
+		$module_info = $this->_my_infos;
+		$module_info['module'] = $module;
+		return $this->_kfw->get('kow_Loader', 'instance')->set_current_module($module_info);
+	}
+
 	public function kfw()
 	{
 		return $this->_kfw;

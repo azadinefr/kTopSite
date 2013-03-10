@@ -9,7 +9,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * See the LICENSE file for the full license text.
  */
 
-define('KOWFRAMEWORK', '1.0.15');
+define('KOWFRAMEWORK', '1.0.25');
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
@@ -123,20 +123,20 @@ class kow_Framework
 
 	public function load_hooks()
 	{
-		if($this->get('config', 'enable_hooks'))
+		if($this->get('config', 'enable_plugins'))
 		{
-			foreach($this->get('config', 'hooks') as $file_path)
+			foreach($this->get('config', 'plugins') as $file_path)
 			{
-				if(is_file(HOOKS_PATH . $file_path . EXT))
+				if(is_file(PLUGINS_PATH . $file_path . EXT))
 				{
-					require_once HOOKS_PATH . $file_path . EXT;
+					require_once PLUGINS_PATH . $file_path . EXT;
 					$file = explode(SEP, $file_path);
 					$hook_class = 'Hook_' . ucfirst(strtolower(end($file)));
 
 					if(class_exists($hook_class, false))
 					{
-						if(is_file(HOOKS_PATH . $file_path . SEP . 'config' . EXT))
-							require_once HOOKS_PATH . $file_path . SEP . 'config' . EXT;
+						if(is_file(PLUGINS_PATH . $file_path . SEP . 'config' . EXT))
+							require_once PLUGINS_PATH . $file_path . SEP . 'config' . EXT;
 
 						if(method_exists($hook_class, '_load'))
 							call_user_func(array($hook_class, '_load'), isset($config) ? $config : null);
@@ -148,7 +148,7 @@ class kow_Framework
 					}
 				}
 				else
-					throw new Exception('Le fichier hook "' . HOOKS_PATH . $file_path . EXT . '" n\'existe pas.');
+					throw new Exception('Le fichier hook "' . PLUGINS_PATH . $file_path . EXT . '" n\'existe pas.');
 			}
 		}
 	}
@@ -319,8 +319,7 @@ class kow_Framework
 			}
 		}
 
-		// Faire un hook?
-		// manque header('HTTP/1.0 404 Not Found'); AUSSI !!!
+		header("HTTP/1.0 404 Not Found");
 		$this->get('kow_Loader', 'instance')->template('404', $this->get('config', 'show_404_master'));
 	}
 
