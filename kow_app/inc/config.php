@@ -60,7 +60,7 @@ $config['plugins'] = array();
  * Chargement automatique des helpers spéficié ci-dessous
  * Par défaut : url
  */
-$config['autoload_helpers'] = array('url', 'alert');
+$config['autoload_helpers'] = array('url');
 
 /**
  * Paramètre pour la connexion à une base de données
