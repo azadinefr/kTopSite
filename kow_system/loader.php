@@ -132,7 +132,14 @@ class kow_Loader
 					$view = MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $this->_module['action'] . EXT;
 		}
 		else
-	    	$view = MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $view . EXT;
+		{
+
+	    	$view = MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $this->_module['controller'] . SEP . $view . EXT;
+
+			if($this->_module['module'] == $this->_module['controller'])
+				if(is_file(MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $view . EXT))
+					$view = MODULES_PATH . $this->_module['module'] . SEP . 'views' . SEP . $view . EXT;
+	    }
 
         if(!is_file($view))
         {
