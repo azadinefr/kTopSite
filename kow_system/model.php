@@ -19,7 +19,7 @@ class kow_Model
 	private $_index = 0;
 	private $_queryLog = '';
 
-	function __construct($database)
+	public function __construct($database)
 	{
 		$connections = kow_Framework::get_instance()->get('kow_Model', 'connections', false);
 
@@ -104,8 +104,7 @@ class kow_Model
 
 		$result = $this->_query->fetchAll(PDO::FETCH_OBJ);
 
-		// or non ?
-		if($current and sizeof($result) == 1)
+		if(($current and sizeof($result) == 1) or sizeof($result) == 1)
 			return current($result);
 		else
 			return $result;
