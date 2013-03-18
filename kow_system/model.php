@@ -59,6 +59,13 @@ class kow_Model
 		$this->_index = 0;
 		$this->_query = $this->_db->prepare($query);
 
+		if (func_num_args() > 1)
+		{
+			$params = array_slice(func_get_args(), 1);
+			foreach ($params as $param)
+				$this->bind($param);
+		}
+
 		return $this;
 	}
 
@@ -97,6 +104,7 @@ class kow_Model
 
 		$result = $this->_query->fetchAll(PDO::FETCH_OBJ);
 
+		// or non ?
 		if($current and sizeof($result) == 1)
 			return current($result);
 		else
