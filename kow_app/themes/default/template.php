@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8" />
-        <title>Bienvenue dans KOWFramework</title>
+        <title>Bienvenue dans kowFramework</title>
         <?php css('default.css'); ?>
     </head>
     <body>

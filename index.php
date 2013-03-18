@@ -43,7 +43,7 @@ else
 if(($_SERVER['SCRIPT_NAME']) == '/')
     define('BASE_URL', '');
 else
-    define('BASE_URL', dirname($_SERVER['SCRIPT_NAME']) . '/');
+    define('BASE_URL', rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/');
 
 session_start();
 
