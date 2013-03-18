@@ -13,7 +13,6 @@ class kow_Loader
 {
 	private $_kfw = null;
 	private $_module = null;
-
 	private $_theme_path = '';
 
 	public function __construct()

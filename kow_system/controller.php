@@ -13,6 +13,7 @@ class kow_Controller
 {
 	private $_kfw = null;
 	private $_vars = array();
+	private $_my_infos = array();
 	private $_request = array();
 	private $_view = null;
 	private $_rendered = false;
@@ -35,6 +36,14 @@ class kow_Controller
 			return $this->_vars[$key];
 		else
 			throw new Exception('Le paramètre "' . $key . '" n\'existe pas.');
+	}
+
+	public function my_infos($infos = null)
+	{
+		if ($infos)
+			$this->_my_infos = $infos;
+		else
+			return $this->_my_infos;
 	}
 
 	public function template_name($name = null)
@@ -90,12 +99,12 @@ class kow_Controller
 
 	public function load_my()
 	{
-		return $this->_kfw->get('kow_Loader', 'instance')->set_current_module($this->_my_infos);
+		return $this->_kfw->get('kow_Loader', 'instance')->set_current_module($this->my_infos());
 	}
 
 	public function load_his($module)
 	{
-		$module_info = $this->_my_infos;
+		$module_info = $this->my_infos();
 		$module_info['module'] = $module;
 		return $this->_kfw->get('kow_Loader', 'instance')->set_current_module($module_info);
 	}

@@ -9,7 +9,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * See the LICENSE file for the full license text.
  */
 
-define('KOWFRAMEWORK', '1.0.30');
+define('KOWFRAMEWORK', '1.0.31');
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
@@ -275,12 +275,12 @@ class kow_Framework
 						else
 							throw new Exception('Impossible de lancer deux fois le même module. En tout cas pour l\'instant.');
 
-						$module_object->_my_infos = array(
+						$module_object->my_infos(array(
 							'module' => $module,
 							'controller' => $controller,
 							'action' => $action,
 							'params' => $params
-						);
+						));
 
 						if(file_exists(MODULES_PATH . $module . SEP . 'config' . SEP . $module . EXT))
 						{
