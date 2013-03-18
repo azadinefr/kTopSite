@@ -17,7 +17,7 @@ if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
  * Si désactivé : http://localhost/kowframework/index.php?p=page/index
  * Par défaut : false (désactivé)
  */
-$config['enable_url_rewriting'] = true;
+$config['enable_url_rewriting'] = false;
 
 /**
  * Module (contrôleur) par défaut
@@ -65,10 +65,9 @@ $config['autoload_helpers'] = array('url');
 /**
  * Paramètre pour la connexion à une base de données
  */
-/*
 $config['database'] = array(
 
-		// database name 
+		// Nom de la base de données
 		'kowframework' => array(
 			'host' 		=> 'localhost',
 			'port'		=> 3306,
@@ -80,4 +79,3 @@ $config['database'] = array(
 			)
 		)
 );
-*/
