@@ -9,7 +9,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * See the LICENSE file for the full license text.
  */
 
-define('KOWFRAMEWORK', '1.0.29');
+define('KOWFRAMEWORK', '1.0.30');
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
@@ -41,7 +41,7 @@ class kow_Framework
 
 		$this->set('config', $config);
 		$this->set('kow_Loader', 'instance', new kow_Loader);
-		$this->load_hooks();
+		$this->load_plugins();
 
         foreach($this->get('config', 'autoload_helpers') as $v)
         	$this->get('kow_Loader', 'instance')->helper($v);
@@ -121,7 +121,7 @@ class kow_Framework
 			$this->_vars[$category][$key] = $value;
 	}
 
-	public function load_hooks()
+	public function load_plugins()
 	{
 		if($this->get('config', 'enable_plugins'))
 		{
@@ -131,24 +131,23 @@ class kow_Framework
 				{
 					require_once PLUGINS_PATH . $file_path . EXT;
 					$file = explode(SEP, $file_path);
-					$hook_class = 'Hook_' . ucfirst(strtolower(end($file)));
+					$plugin_class = 'Plugin_' . ucfirst(strtolower(end($file)));
 
-					if(class_exists($hook_class, false))
+					if(class_exists($plugin_class, false))
 					{
 						if(is_file(PLUGINS_PATH . $file_path . SEP . 'config' . EXT))
 							require_once PLUGINS_PATH . $file_path . SEP . 'config' . EXT;
 
-						if(method_exists($hook_class, '_load'))
-							call_user_func(array($hook_class, '_load'), isset($config) ? $config : null);
+						if(method_exists($plugin_class, '_load'))
+							call_user_func(array($plugin_class, '_load'), isset($config) ? $config : null);
 ;
-						// hook function start with "_"
-						foreach(get_class_methods($hook_class) as $function)
+						foreach(get_class_methods($plugin_class) as $function)
 							if($function[0] == '_')
-								$this->set('hooks', substr($function, 1), array($hook_class, $function), true);
+								$this->set('hooks', substr($function, 1), array($plugin_class, $function), true);
 					}
 				}
 				else
-					throw new Exception('Le fichier hook "' . PLUGINS_PATH . $file_path . EXT . '" n\'existe pas.');
+					throw new Exception('Le plugin "' . PLUGINS_PATH . $file_path . EXT . '" n\'existe pas.');
 			}
 		}
 	}
