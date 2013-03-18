@@ -35,7 +35,7 @@ class kow_Loader
 				$this->helper($h);
 
 		$helper = explode(SEP, $helper);
-		$helper = ucfirst(end($helper));
+		$helper = end($helper);
 
 		if($this->_module['module'])
 			$path = MODULES_PATH . $this->_module['module'] . SEP . 'helpers' . SEP . $helper . EXT;
