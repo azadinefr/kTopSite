@@ -9,7 +9,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * See the LICENSE file for the full license text.
  */
 
-define('KOWFRAMEWORK', '1.0.33');
+define('KOWFRAMEWORK', '1.0.34');
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
@@ -282,11 +282,8 @@ class kow_Framework
 							'params' => $params
 						));
 
-						if(file_exists(MODULES_PATH . $module . SEP . 'config' . SEP . $module . EXT))
-						{
-							require_once MODULES_PATH . $module . SEP . 'config' . SEP . $module . EXT;
-							$module_object->config = $config;
-						}
+						if(file_exists(MODULES_PATH . $module . SEP . 'config' . SEP . 'config' . EXT))
+							$module_object->config = require_once MODULES_PATH . $module . SEP . 'config' . SEP . 'config' . EXT;
 
 						if(isset($module_object->config) and isset( $module_object->config['autoload_helpers']))
 					    	if($helpers = $module_object->config['autoload_helpers'])
