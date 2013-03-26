@@ -9,7 +9,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * See the LICENSE file for the full license text.
  */
 
-define('KOWFRAMEWORK', '1.0.34');
+define('KOWFRAMEWORK', '1.0.36');
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
