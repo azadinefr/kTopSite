@@ -27,7 +27,7 @@ class kow_Model
 			$this->_db = $connections[$database];
 		else
 		{
-			$db = kow_Framework::get_instance()->get('config', 'database', false);
+			$db = kow_Framework::get_instance()->get('kow_Config', 'database', false);
 			if(!isset($db[$database]) or !is_array($db[$database]))
 				throw new Exception('Les informations de connexion à la base de données "' . $database . '" n\'existe pas.');
 

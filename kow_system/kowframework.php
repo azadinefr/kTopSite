@@ -28,22 +28,22 @@ class kow_Framework
 	{
 		self::$_instance =& $this;
 
-		if(!is_file(CONFIG_PATH))
-			throw new Exception('Le fichier de configuration "' . CONFIG_PATH . '" n\'existe pas.');
+		if(!is_file(CONFIG_PATH . 'kowframework' . EXT))
+			throw new Exception('Le fichier de configuration "' . CONFIG_PATH . 'kowframework' . EXT. '" n\'existe pas.');
 
-		require_once CONFIG_PATH;
+		require_once CONFIG_PATH . 'kowframework' . EXT;
 
 		if(empty($config) or !is_array($config))
-			throw new Exception('Le fichier de configuration "' . CONFIG_PATH . '" est mal formaté.');
+			throw new Exception('Le fichier de configuration "' . CONFIG_PATH . 'kowframework' . EXT . '" est mal formaté.');
 
 		if(@date_default_timezone_set(date_default_timezone_get()) === false)
 			date_default_timezone_set($config['timezone']);
 
-		$this->set('config', $config);
+		$this->set('kow_Config', $config);
 		$this->set('kow_Loader', 'instance', new kow_Loader);
 		$this->load_plugins();
 
-        foreach($this->get('config', 'autoload_helpers') as $v)
+        foreach($this->get('kow_Config', 'autoload_helpers') as $v)
         	$this->get('kow_Loader', 'instance')->helper($v);
 	}
 
@@ -123,9 +123,9 @@ class kow_Framework
 
 	public function load_plugins()
 	{
-		if($this->get('config', 'enable_plugins'))
+		if($this->get('kow_Config', 'enable_plugins'))
 		{
-			foreach($this->get('config', 'plugins') as $file_path)
+			foreach($this->get('kow_Config', 'plugins') as $file_path)
 			{
 				if(is_file(PLUGINS_PATH . $file_path . EXT))
 				{
@@ -196,7 +196,7 @@ class kow_Framework
 
 	public function route()
 	{
-		$controller = $this->get('config', 'default_controller');
+		$controller = $this->get('kow_Config', 'default_controller');
 		$action = 'index';
 		$params = array();
 
@@ -283,7 +283,7 @@ class kow_Framework
 						));
 
 						if(file_exists(MODULES_PATH . $module . SEP . 'config' . SEP . 'config' . EXT))
-							$module_object->config = require_once MODULES_PATH . $module . SEP . 'config' . SEP . 'config' . EXT;
+							$module_object->config = $module_object->load_my()->config('config');
 
 						if(isset($module_object->config) and isset( $module_object->config['autoload_helpers']))
 					    	if($helpers = $module_object->config['autoload_helpers'])
@@ -316,7 +316,7 @@ class kow_Framework
 		}
 
 		header("HTTP/1.0 404 Not Found");
-		$this->get('kow_Loader', 'instance')->template('404', $this->get('config', 'show_404_master'));
+		$this->get('kow_Loader', 'instance')->template('404', $this->get('kow_Config', 'show_404_master'));
 	}
 
 	public function set_template_var($name, $var)
@@ -328,8 +328,8 @@ class kow_Framework
 	{
 		ob_start();
 
-		if(is_file(THEMES_PATH . $this->get('config', 'theme_path') . SEP . 'build' . EXT))
-			require_once THEMES_PATH . $this->get('config', 'theme_path') . SEP . 'build' . EXT;
+		if(is_file(THEMES_PATH . $this->get('kow_Config', 'theme_path') . SEP . 'build' . EXT))
+			require_once THEMES_PATH . $this->get('kow_Config', 'theme_path') . SEP . 'build' . EXT;
 
 		if($this->get('kow_Templates', null, false))
 			extract($this->get('kow_Templates', null));
@@ -337,7 +337,7 @@ class kow_Framework
 		if($template)
 			$layout_content = $template;
 
-		$theme = THEMES_PATH . $this->get('config', 'theme_path') . SEP . 'template' . EXT;
+		$theme = THEMES_PATH . $this->get('kow_Config', 'theme_path') . SEP . 'template' . EXT;
 		if(!is_file($theme))
 			throw new Exception('Le fichier de thème par défaut "' . $theme . '" n\'existe pas.');
 

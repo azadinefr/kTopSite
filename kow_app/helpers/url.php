@@ -2,7 +2,7 @@
 
 if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
 
-$kfw_config = kow_Framework::get_instance()->get('config');
+$kfw_config = kow_Framework::get_instance()->get('kow_Config');
 define('THEME_PATH', $kfw_config['theme_path']);
 define('URL_REWRITING_ENABLED', $kfw_config['enable_url_rewriting']);
 

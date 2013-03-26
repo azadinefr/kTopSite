@@ -18,13 +18,34 @@ class kow_Loader
 	public function __construct()
 	{
 		$this->_kfw =& kow_Framework::get_instance();
-		$this->_theme_path = $this->_kfw->get('config', 'theme_path');
+		$this->_theme_path = $this->_kfw->get('kow_Config', 'theme_path');
 	}
 
 	public function set_current_module($module)
 	{
 		$this->_module = $module;
 		return $this;
+	}
+
+	public function config($config)
+	{
+		if($this->_module['module'])
+			$path = MODULES_PATH . $this->_module['module'] . SEP . 'config' . SEP . $config . EXT;
+		else
+			$path = CONFIG_PATH . $config . EXT;
+
+		if(is_file($path))
+		{
+			if ($path == CONFIG_PATH . 'kowframework' . EXT)
+				$config = $this->_kfw->get('kow_Config');
+			else 
+				$config = require $path;
+		}
+		else
+			throw new Exception('Le fichier de configuration "' . $path . '" n\'existe pas.');
+
+		$this->_module = null;
+		return $config;
 	}
 
 	public function helper($helper)
@@ -145,7 +166,7 @@ class kow_Loader
         	if(DEBUG_MODE)
         		throw new Exception('La vue "' . $view . '" pour l\'action "' . $this->_module['action'] . '" du contrôleur "' . $this->_module['controller'] . '" n\'existe pas.');
         	else
-        		$this->template('404', $this->_kfw->get('config', 'show_404_master'));
+        		$this->template('404', $this->_kfw->get('kow_Config', 'show_404_master'));
         }
 
         $this->_kfw->get('kow_Modules', $this->_module['module'])->set_view($view);
@@ -155,8 +176,8 @@ class kow_Loader
 	public function template($template, $include_in_master = true)
 	{
 		if(!$include_in_master)
-			if(is_file(THEMES_PATH . $this->_kfw->get('config', 'theme_path') . SEP . 'build' . EXT))
-				require_once THEMES_PATH . $this->_kfw->get('config', 'theme_path') . SEP . 'build' . EXT;
+			if(is_file(THEMES_PATH . $this->_kfw->get('kow_Config', 'theme_path') . SEP . 'build' . EXT))
+				require_once THEMES_PATH . $this->_kfw->get('kow_Config', 'theme_path') . SEP . 'build' . EXT;
 
 		$template = THEMES_PATH . $this->_theme_path . SEP . 'templates' . SEP . $template . EXT;
 

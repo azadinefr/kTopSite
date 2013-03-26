@@ -19,8 +19,7 @@ define('SEP',				'/');
 define('SYS_PATH', 			'kow_system/');
 define('APP_PATH', 			'kow_app');
 
-define('CONFIG_PATH', 		APP_PATH . SEP . 'inc/config' . EXT);
-
+define('CONFIG_PATH', 		APP_PATH . SEP . 'config/');
 define('HELPERS_PATH', 		APP_PATH . SEP . 'helpers/');
 define('LIBS_PATH',			APP_PATH . SEP . 'libraries/');
 define('MODULES_PATH',		APP_PATH . SEP . 'modules/');

@@ -25,4 +25,28 @@ class index extends kow_Model
 	{
 		parent::__construct($database);
 	}
+
+	public function api_methods()
+	{
+		return $this->newQuery('SELECT * FROM api_methods')->exec();
+	}
+
+	public function delete_methods()
+	{
+		return $this->newQuery('DELETE FROM api_methods')->exec();
+	}
+
+	public function save_method($object)
+	{
+		$req = $this->newQuery('INSERT INTO api_methods (id, file, visibility, f_return, function, settings, description, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+		$req->bind(++$object->id);
+		$req->bind($object->file);
+		$req->bind($object->visibility);
+		$req->bind($object->f_return);
+		$req->bind($object->function);
+		$req->bind($object->settings);
+		$req->bind($object->description);
+		$req->bind($object->source);
+		return $req->exec();
+	}
 }
