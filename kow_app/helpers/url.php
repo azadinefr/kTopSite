@@ -14,6 +14,13 @@ function url($url)
 		echo 'index.php?p=' . $url;
 }
 
+function favicon($icon)
+{
+	$ext = explode('.', $icon);
+	$mime = (strtolower(end($ext)) == 'png') ? 'png' : 'x-icon';
+	echo '<link rel="shortcut icon" type="image/' . $mime . '" href="' . BASE_URL . THEMES_PATH . THEME_PATH . '/images/' . $icon . '" />' . PHP_EOL;
+}
+
 function img($image)
 {
 	echo BASE_URL . THEMES_PATH . THEME_PATH . '/images/' .  $image;
