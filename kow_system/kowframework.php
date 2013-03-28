@@ -9,7 +9,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * See the LICENSE file for the full license text.
  */
 
-define('KOWFRAMEWORK', '1.0.37');
+define('KOWFRAMEWORK', '1.0.38');
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
@@ -305,11 +305,10 @@ class kow_Framework
 
 					    if($module == $this->get('router', 'controller'))
 					    	$this->set_template_var('layout_content', $out);
-						
 					    else
 					    	$this->set_template_var($render_name, $out);
 					    
-					    return;
+					    return $out;
 					}
 				}
 			}
