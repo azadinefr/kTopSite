@@ -41,8 +41,10 @@ class kow_Controller
 
 	public function my_infos($infos = null)
 	{
-		if ($infos)
+		if (is_array($infos))
 			$this->_my_infos = $infos;
+		else if (isset($infos) && isset($this->_my_infos[$infos]))
+			return $this->_my_infos[$infos];
 		else
 			return $this->_my_infos;
 	}
