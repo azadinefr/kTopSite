@@ -9,7 +9,7 @@ if(!defined('SYS_PATH')) exit('You can\'t access this ressource.');
  * See the LICENSE file for the full license text.
  */
 
-define('KOWFRAMEWORK', '1.0.38');
+define('KOWFRAMEWORK', '1.0.39');
 
 set_error_handler(array('kow_Exception', 'error_handler'));
 set_exception_handler(array('kow_Exception', 'exception_handler'));
@@ -131,7 +131,7 @@ class kow_Framework
 				{
 					require_once PLUGINS_PATH . $file_path . EXT;
 					$file = explode(SEP, $file_path);
-					$plugin_class = 'Plugin_' . ucfirst(strtolower(end($file)));
+					$plugin_class = 'Plugin_' . end($file);
 
 					if(class_exists($plugin_class, false))
 					{
