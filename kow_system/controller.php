@@ -23,6 +23,7 @@ class kow_Controller
 	public function __construct()
 	{
 		$this->_kfw =& kow_Framework::get_instance();
+		$this->config = array();
 	}
 
 	public function __set($key, $value)

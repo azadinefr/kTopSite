@@ -27,25 +27,32 @@ class kow_Loader
 		return $this;
 	}
 
-	public function config($config)
+	public function config($config_file, $sub_array = false)
 	{
 		if($this->_module['module'])
-			$path = MODULES_PATH . $this->_module['module'] . SEP . 'config' . SEP . $config . EXT;
+			$path = MODULES_PATH . $this->_module['module'] . SEP . 'config' . SEP . $config_file . EXT;
 		else
-			$path = CONFIG_PATH . $config . EXT;
+			$path = CONFIG_PATH . $config_file . EXT;
 
 		if(is_file($path))
 		{
 			if ($path == CONFIG_PATH . 'kowframework' . EXT)
 				$config = $this->_kfw->get('kow_Config');
-			else 
-				$config = require $path;
+			else
+				require $path;
+			
+			if (!isset($config) or !is_array($config))
+				throw new Exception('Le fichier de configuration "' . $path . '" ne contient pas un tableau (array) valide.');
 		}
 		else
 			throw new Exception('Le fichier de configuration "' . $path . '" n\'existe pas.');
 
 		$this->_module = null;
-		return $config;
+
+		if ($sub_array)
+			return array($config_file => $config);
+		else
+			return $config;
 	}
 
 	public function helper($helper)
@@ -73,12 +80,12 @@ class kow_Loader
 	public function library($library)
 	{
 		if($this->_module)
-			$path = MODULES_PATH . $this->_module['module'] . SEP . 'libraries' . SEP . $library;
+			$path = MODULES_PATH . $this->_module['module'] . SEP . 'libraries' . SEP . strtolower($library) . EXT;
 		else
-			$path = LIBS_PATH . $library;
+			$path = LIBS_PATH . strtolower($library) . EXT;
 
 		$lib_name = explode(SEP, $library);
-		$lib_name = ucfirst(end($lib_name));
+		$lib_name = end($lib_name);
 		$lib_index = ($this->_module) ? $this->_module['module'] . SEP . $lib_name : $lib_name;
 
 		if(func_num_args() > 1)
@@ -90,7 +97,10 @@ class kow_Loader
 		if(class_exists($lib_name))
 			throw new Exception('Une classe du même nom "' . $lib_name . '" est déjà instanciée. Vivement les namespaces.');
 
-		require_once($path . EXT);
+		if (!is_file($path))
+			throw new Exception('La librairie "' . $path . '" n\'existe pas.');
+
+		require_once($path);
 
 		if(isset($params))
 			$lib = new $lib_name($params);
