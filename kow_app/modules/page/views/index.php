@@ -14,6 +14,6 @@
 	Ceci est la page par défaut de votre site internet.<br />
 	Vous pouvez la modifier dans le fichier suivant :
 	<code>
-		kow_app/views/page/index.php
+		kow_app/modules/page/views/index.php
 	</code>
 </div><br />
