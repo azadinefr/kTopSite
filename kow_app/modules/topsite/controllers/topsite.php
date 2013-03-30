@@ -2,7 +2,7 @@
 
 if(!defined('KOWFRAMEWORK')) exit('You can\'t access this ressource.');
 
-class Controller_Page extends kow_Controller
+class Controller_Topsite extends kow_Controller
 {
 	public function index()
 	{

@@ -1,62 +1,99 @@
+/**
+ * Thème par défaut kTopSite.
+ * Basé sur le thème exemple de Twitter Bootstrap :
+ * http://twitter.github.com/bootstrap/examples/justified-nav.html)
+ * @author Kevin Ryser
+ */
+
 body
 {
-	width: 700px;
-	margin: auto;
-	color: #333333;
-	font-family: Arial, "Lucida Grande", sans-serif;
-	font-size: 14px;
+	padding-top: 20px;
+	padding-bottom: 60px;
 }
 
-h1 { font-size: 48px; margin: 0; }
-h2 { font-size: 24px; text-align: center; }
-
-hr.soften
+.container
 {
-	height: 1px;
-	background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,.1), rgba(0,0,0,0));
-	background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,.1), rgba(0,0,0,0));
-	background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,.1), rgba(0,0,0,0));
-	background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,.1), rgba(0,0,0,0));
-	border: 0;
+	margin: 0 auto;
+	max-width: 1000px;
 }
 
-#welcome
+.container > hr
 {
-	margin-top: 40px;
-	padding: 20px;
-	background-color: #F5F5F5;
-	-webkit-box-shadow: 0px 0px 10px 0px #D0D0D0;
-	box-shadow: 0px 0px 10px 0px #D0D0D0;
-	font-size: 16px;
+	margin-top: 30px;
+	margin-bottom: 15px;
 }
 
-#container
+.jumbotron
 {
-	padding: 20px;
-	background-color: #F5F5F5;
-	border: 1px solid rgba(0, 0, 0, 0.05);
-	border-radius: 4px 4px 4px 4px;
-	-webkit-box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.05);
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05) inset;
+	margin: 80px 0;
+	text-align: center;
 }
 
-#success
+.jumbotron h1
 {
-	padding: 8px;
-	background-color: #DFF0D8;
-	border-color: #D6E9C6;
-	border-radius: 4px 4px 4px 4px;
-	color: #468847;
+	font-size: 100px;
+	line-height: 1;
 }
 
-code
+.jumbotron .lead
 {
-    background-color: #F7F7F9;
-    border: 1px solid #E1E1E8;
-    color: #DD1144;
-    padding: 1px;
-    border-radius: 4px 4px 4px 4px;
+	font-size: 24px;
+	line-height: 1.25;
 }
 
-footer { font-size: 12px; text-align: center; }
+.jumbotron .btn
+{
+	font-size: 21px;
+	padding: 14px 24px;
+}
+
+.marketing
+{
+	margin: 60px 0;
+}
+
+.marketing p + h4
+{
+	margin-top: 28px;
+}
+
+.navbar .navbar-inner
+{
+	padding: 0;
+}
+
+.navbar .nav
+{
+	margin: 0;
+	display: table;
+	width: 100%;
+}
+
+.navbar .nav li
+{
+	display: table-cell;
+	width: 1%;
+	float: none;
+}
+
+.navbar .nav li a
+{
+	font-weight: bold;
+	text-align: center;
+	border-left: 1px solid rgba(255,255,255,.75);
+	border-right: 1px solid rgba(0,0,0,.1);
+}
+
+.navbar .nav li:first-child a
+{
+	border-left: 0;
+	border-radius: 3px 0 0 3px;
+}
+
+.navbar .nav li:last-child a
+{
+	border-right: 0;
+	border-radius: 0 3px 3px 0;
+}
+
 footer img { vertical-align: middle; }

@@ -23,7 +23,7 @@ $config['enable_url_rewriting'] = false;
  * Module (contrôleur) par défaut
  * Par défaut : page
  */
-$config['default_controller'] = 'page';
+$config['default_controller'] = 'topsite';
 
 /**
  * Affiche le template "404" dans le template principal
